@@ -140,9 +140,23 @@ struct ProviderView: View {
           )
         }
         
-        let filteredModels = allOpenRouterModels.filter { modelInfo in
-          modelInfo.id.hasPrefix("\(prefix)/")
-        }
+        let filteredModels = allOpenRouterModels
+          .filter { modelInfo in
+            modelInfo.id.hasPrefix("\(prefix)/")
+          }
+          .map { modelInfo in
+            // Remove prefix from model ID
+            let prefixWithSlash = "\(prefix)/"
+            let modelIdWithoutPrefix = modelInfo.id.hasPrefix(prefixWithSlash)
+              ? String(modelInfo.id.dropFirst(prefixWithSlash.count))
+              : modelInfo.id
+            return ModelInfo(
+              id: modelIdWithoutPrefix,
+              name: modelInfo.name,
+              inputContextLength: modelInfo.inputContextLength,
+              outputContextLength: modelInfo.outputContextLength
+            )
+          }
         
         if !filteredModels.isEmpty {
           fetchedModels = filteredModels
@@ -180,11 +194,23 @@ struct ProviderView: View {
           }
         }
         
-        // Filter by prefix
+        // Filter by prefix and remove prefix from model ID
         if !allOpenRouterModels.isEmpty {
-          let filteredModels = allOpenRouterModels.filter { modelInfo in
-            modelInfo.id.hasPrefix("\(prefix)/")
-          }
+          let prefixWithSlash = "\(prefix)/"
+          let filteredModels = allOpenRouterModels
+            .filter { modelInfo in
+              modelInfo.id.hasPrefix(prefixWithSlash)
+            }
+            .map { modelInfo in
+              // Remove prefix from model ID
+              let modelIdWithoutPrefix = String(modelInfo.id.dropFirst(prefixWithSlash.count))
+              return ModelInfo(
+                id: modelIdWithoutPrefix,
+                name: modelInfo.name,
+                inputContextLength: modelInfo.inputContextLength,
+                outputContextLength: modelInfo.outputContextLength
+              )
+            }
           
           fetchedModels = filteredModels
           AppLogger.data.info("Fetched \(filteredModels.count) models from OpenRouter API filtered by prefix '\(prefix)/'")
