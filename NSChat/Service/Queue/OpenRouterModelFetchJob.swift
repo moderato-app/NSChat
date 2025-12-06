@@ -76,7 +76,7 @@ final class OpenRouterModelFetchJob: Job {
   
   func onRetry(error: Error) -> RetryConstraint {
     // Retry with exponential backoff: 1 minute, 2 minutes, 4 minutes, etc., max 1 hour
-    return .exponentialWithLimit(initial: 60, maxDelay: 3600)
+    return .exponentialWithLimit(initial: 2, maxDelay: 3600)
   }
   
   func onRemove(result: JobCompletion) {
