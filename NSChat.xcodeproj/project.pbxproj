@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */ = {isa = PBXBuildFile; productRef = EB05DC9C2EE4BDC800D5654F /* SwiftQueue */; };
 		EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = EB1B46DE2EDAF0AD00FD053A /* AIProxy */; };
 		EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */ = {isa = PBXBuildFile; productRef = EB508AF92EE2187300D27F29 /* SystemNotification */; };
 		EB8FB4F32C3940D60041833B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = EB8FB4F22C3940D60041833B /* MarkdownUI */; };
@@ -66,6 +67,7 @@
 				EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */,
 				EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */,
 				EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */,
+				EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +114,7 @@
 				EBB4EF282CDDC02200F38178 /* VisualEffectView */,
 				EB1B46DE2EDAF0AD00FD053A /* AIProxy */,
 				EB508AF92EE2187300D27F29 /* SystemNotification */,
+				EB05DC9C2EE4BDC800D5654F /* SwiftQueue */,
 			);
 			productName = NSChat;
 			productReference = EB1B51812EDB004800FD053A /* NSChat.app */;
@@ -150,6 +153,7 @@
 				EBB4EF272CDDC02200F38178 /* XCRemoteSwiftPackageReference "VisualEffectView" */,
 				EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */,
 				EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */,
+				EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */,
 			);
 			productRefGroup = EB6422072B6F7BB000119DE6;
 			projectDirPath = "";
@@ -415,6 +419,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lucas34/SwiftQueue";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.2;
+			};
+		};
 		EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/lzell/AIProxySwift.git";
@@ -474,6 +486,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		EB05DC9C2EE4BDC800D5654F /* SwiftQueue */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */;
+			productName = SwiftQueue;
+		};
 		EB1B46DE2EDAF0AD00FD053A /* AIProxy */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */;
