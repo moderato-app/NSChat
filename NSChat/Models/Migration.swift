@@ -10,14 +10,6 @@ func migrate(_ modelContext: ModelContext) throws {
 }
 
 private func fillData(_ modelContext: ModelContext) throws {
-  if !Pref.shared.fillDataRecordGreeting {
-    modelContext.insert(ChatSample.greetings)
-    for m in ChatSample.greetings.messages {
-      m.chat = ChatSample.greetings
-    }
-    Pref.shared.fillDataRecordGreeting = true
-  }
-
   if !Pref.shared.fillDataRecordPrompts {
     try fillPrompts(modelContext, save: false)
     Pref.shared.fillDataRecordPrompts = true

@@ -2,17 +2,6 @@ import Foundation
 import SwiftData
 
 enum ChatSample {
-  static let greetings = Chat(
-    name: "A cup of coffee",
-    messages: [
-      Message("How to make a cup of coffee?", .user, .sent),
-      Message("""
-      To make a cup of coffee, start by boiling water and measuring out 2 tablespoons of coffee grounds. Place the grounds in a filter and pour the hot water over them. Let it steep for 4 minutes, then remove the filter. Add any desired cream or sugar and enjoy!
-      """, .assistant, .received),
-      Message("", .assistant, .error, errorInfo: "To chat with AI, set up AI provider", errorType: .apiKey)
-    ]
-  )
-
   static let emptyMessage = Chat(
     name: "Emtpy"
   )
