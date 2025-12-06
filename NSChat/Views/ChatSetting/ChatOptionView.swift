@@ -41,8 +41,8 @@ struct ChatOptionView: View {
       }
 
       VStack(alignment: .leading) {
-        Label("Context Length", systemImage: "square.3.layers.3d.down.left")
-        Picker("Context Length", selection: $chatOption.contextLength) {
+        Label("History Messages", systemImage: "square.3.layers.3d.down.left")
+        Picker("History Messages", selection: $chatOption.contextLength) {
           ForEach(contextLengthChoices, id: \.self) { c in
             Text("\(c.lengthString)")
               .tag(c.length)
