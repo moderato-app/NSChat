@@ -125,44 +125,70 @@ struct ProviderView: View {
     
     // If no models were fetched, try OpenRouter fallback
     if fetchedModels.isEmpty, let prefix = provider.type.openRouterPrefix {
-      // Try to fetch OpenRouter models - first try with empty API key (public access),
-      // then try with provider's API key if that fails
-      var allOpenRouterModels: [ModelInfo] = []
+      // First, try to get OpenRouter models from database
+      let descriptor = FetchDescriptor<OpenRouterModel>()
+      let dbModels = try? modelContext.fetch(descriptor)
       
-      // Try with empty API key first (some endpoints allow public access)
-      do {
-        let openRouterFetcher = OpenRouterModelFetcher()
-        allOpenRouterModels = try await openRouterFetcher.fetchModels(
-          apiKey: "",
-          endpoint: nil
-        )
-        AppLogger.data.info("Fetched OpenRouter models with public access")
-      } catch {
-        // If that fails, try with provider's API key
-        do {
-          let openRouterFetcher = OpenRouterModelFetcher()
-          allOpenRouterModels = try await openRouterFetcher.fetchModels(
-            apiKey: provider.apiKey,
-            endpoint: nil
+      if let dbModels = dbModels, !dbModels.isEmpty {
+        // Convert database models to ModelInfo and filter by prefix
+        let allOpenRouterModels = dbModels.map { model in
+          ModelInfo(
+            id: model.modelId,
+            name: model.modelName,
+            inputContextLength: model.inputContextLength,
+            outputContextLength: model.outputContextLength
           )
-          AppLogger.data.info("Fetched OpenRouter models with provider API key")
-        } catch {
-          AppLogger.logError(.from(
-            error: error,
-            operation: "Fetch models from OpenRouter",
-            component: "ProviderView"
-          ))
         }
-      }
-      
-      // Filter by prefix
-      if !allOpenRouterModels.isEmpty {
+        
         let filteredModels = allOpenRouterModels.filter { modelInfo in
           modelInfo.id.hasPrefix("\(prefix)/")
         }
         
-        fetchedModels = filteredModels
-        AppLogger.data.info("Fetched \(filteredModels.count) models from OpenRouter filtered by prefix '\(prefix)/'")
+        if !filteredModels.isEmpty {
+          fetchedModels = filteredModels
+          AppLogger.data.info("Fetched \(filteredModels.count) models from database filtered by prefix '\(prefix)/'")
+        }
+      }
+      
+      // If database has no models, fetch from OpenRouter API
+      if fetchedModels.isEmpty {
+        var allOpenRouterModels: [ModelInfo] = []
+        
+        // Try with empty API key first (some endpoints allow public access)
+        do {
+          let openRouterFetcher = OpenRouterModelFetcher()
+          allOpenRouterModels = try await openRouterFetcher.fetchModels(
+            apiKey: "",
+            endpoint: nil
+          )
+          AppLogger.data.info("Fetched OpenRouter models with public access")
+        } catch {
+          // If that fails, try with provider's API key
+          do {
+            let openRouterFetcher = OpenRouterModelFetcher()
+            allOpenRouterModels = try await openRouterFetcher.fetchModels(
+              apiKey: provider.apiKey,
+              endpoint: nil
+            )
+            AppLogger.data.info("Fetched OpenRouter models with provider API key")
+          } catch {
+            AppLogger.logError(.from(
+              error: error,
+              operation: "Fetch models from OpenRouter",
+              component: "ProviderView"
+            ))
+          }
+        }
+        
+        // Filter by prefix
+        if !allOpenRouterModels.isEmpty {
+          let filteredModels = allOpenRouterModels.filter { modelInfo in
+            modelInfo.id.hasPrefix("\(prefix)/")
+          }
+          
+          fetchedModels = filteredModels
+          AppLogger.data.info("Fetched \(filteredModels.count) models from OpenRouter API filtered by prefix '\(prefix)/'")
+        }
       }
     }
     
