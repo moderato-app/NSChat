@@ -21,7 +21,6 @@ class Pref: ObservableObject {
   @AppStorage("newChatPref-webSearchContextSize") var newChatPrefWebSearchContextSize: WebSearchContextSize = .low
 
   // Fill data record
-  @AppStorage("fillDataRecordGreeting") var fillDataRecordGreeting: Bool = false
   @AppStorage("fillDataRecordPrompts") var fillDataRecordPrompts: Bool = false
 
   func reset() {
@@ -30,7 +29,6 @@ class Pref: ObservableObject {
     self.doubleTapAction = newPref.doubleTapAction
     self.magicScrolling = newPref.magicScrolling
     self.colorScheme = newPref.colorScheme
-    self.fillDataRecordGreeting = newPref.fillDataRecordGreeting
     self.fillDataRecordPrompts = newPref.fillDataRecordPrompts
     self.newChatPrefHistoryMessageCount = newPref.newChatPrefHistoryMessageCount
     self.newChatPrefWebSearchContextSize = newPref.newChatPrefWebSearchContextSize

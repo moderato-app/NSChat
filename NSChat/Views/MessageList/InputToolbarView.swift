@@ -232,7 +232,7 @@ struct InputToolbarView: View {
   ModelContainerPreview(ModelContainer.preview) {
     VStack {
       Spacer()
-      InputToolbarView(chatOption: ChatSample.greetings.option, inputText: .constant(""))
+      InputToolbarView(chatOption: ChatSample.manyMessages.option, inputText: .constant(""))
         .environmentObject(SystemNotificationContext())
     }
   }

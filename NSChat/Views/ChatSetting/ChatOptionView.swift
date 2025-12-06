@@ -65,7 +65,7 @@ struct ChatOptionView: View {
 #Preview {
   ModelContainerPreview(ModelContainer.preview) {
     Form {
-      ChatOptionView(ChatSample.greetings.option)
+      ChatOptionView(ChatSample.manyMessages.option)
     }
   }
 }
