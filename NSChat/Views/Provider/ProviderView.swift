@@ -88,6 +88,123 @@ struct ProviderView: View {
   private func saveProvider() {
     modelContext.insert(provider)
     AppLogger.data.info("Added new provider: \(provider.displayName) with \(provider.models.count) models")
+    
+    // If provider has no models, try to fetch them
+    if provider.models.isEmpty {
+      Task {
+        await fetchModelsForProvider()
+      }
+    }
+    
     dismiss()
+  }
+  
+  private func fetchModelsForProvider() async {
+    guard !provider.apiKey.isEmpty else {
+      AppLogger.data.info("Skipping model fetch for \(provider.displayName): API key is empty")
+      return
+    }
+    
+    // First, try to fetch models using the provider's own fetcher
+    var fetchedModels: [ModelInfo] = []
+    
+    do {
+      let fetcher = provider.type.createFetcher()
+      fetchedModels = try await fetcher.fetchModels(
+        apiKey: provider.apiKey,
+        endpoint: provider.endpoint.isEmpty ? nil : provider.endpoint
+      )
+      AppLogger.data.info("Fetched \(fetchedModels.count) models from \(provider.displayName) API")
+    } catch {
+      AppLogger.logError(.from(
+        error: error,
+        operation: "Fetch models from provider",
+        component: "ProviderView"
+      ))
+    }
+    
+    // If no models were fetched, try OpenRouter fallback
+    if fetchedModels.isEmpty, let prefix = provider.type.openRouterPrefix {
+      // Try to fetch OpenRouter models - first try with empty API key (public access),
+      // then try with provider's API key if that fails
+      var allOpenRouterModels: [ModelInfo] = []
+      
+      // Try with empty API key first (some endpoints allow public access)
+      do {
+        let openRouterFetcher = OpenRouterModelFetcher()
+        allOpenRouterModels = try await openRouterFetcher.fetchModels(
+          apiKey: "",
+          endpoint: nil
+        )
+        AppLogger.data.info("Fetched OpenRouter models with public access")
+      } catch {
+        // If that fails, try with provider's API key
+        do {
+          let openRouterFetcher = OpenRouterModelFetcher()
+          allOpenRouterModels = try await openRouterFetcher.fetchModels(
+            apiKey: provider.apiKey,
+            endpoint: nil
+          )
+          AppLogger.data.info("Fetched OpenRouter models with provider API key")
+        } catch {
+          AppLogger.logError(.from(
+            error: error,
+            operation: "Fetch models from OpenRouter",
+            component: "ProviderView"
+          ))
+        }
+      }
+      
+      // Filter by prefix
+      if !allOpenRouterModels.isEmpty {
+        let filteredModels = allOpenRouterModels.filter { modelInfo in
+          modelInfo.id.hasPrefix("\(prefix)/")
+        }
+        
+        fetchedModels = filteredModels
+        AppLogger.data.info("Fetched \(filteredModels.count) models from OpenRouter filtered by prefix '\(prefix)/'")
+      }
+    }
+    
+    // Update provider's models if we fetched any
+    if !fetchedModels.isEmpty {
+      await MainActor.run {
+        updateProviderModels(with: fetchedModels)
+      }
+    }
+  }
+  
+  private func updateProviderModels(with modelInfos: [ModelInfo]) {
+    var toAdd: [ModelEntity] = []
+    
+    for modelInfo in modelInfos {
+      // Check if model already exists
+      let exists = provider.models.contains { $0.modelId == modelInfo.id }
+      if !exists {
+        let newModel = ModelEntity(
+          provider: provider,
+          modelId: modelInfo.id,
+          modelName: modelInfo.name,
+          inputContextLength: modelInfo.inputContextLength,
+          outputContextLength: modelInfo.outputContextLength
+        )
+        toAdd.append(newModel)
+      }
+    }
+    
+    if !toAdd.isEmpty {
+      provider.models.append(contentsOf: toAdd)
+      AppLogger.data.info("Added \(toAdd.count) models to provider \(provider.displayName)")
+      
+      do {
+        try modelContext.save()
+      } catch {
+        AppLogger.logError(.from(
+          error: error,
+          operation: "Save models to provider",
+          component: "ProviderView"
+        ))
+      }
+    }
   }
 }

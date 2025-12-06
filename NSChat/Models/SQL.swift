@@ -100,6 +100,19 @@ extension ModelContext {
     }
   }
 
+  func clearAllModels() {
+    // Clear all models defined in allSchema (see Container.swift)
+    // Note: Must manually list types as Schema.Entity cannot be directly converted to T.Type
+    clearAll(Chat.self)
+    clearAll(ChatOption.self)
+    clearAll(WebSearch.self)
+    clearAll(Prompt.self)
+    clearAll(PromptMessage.self)
+    clearAll(Provider.self)
+    clearAll(ModelEntity.self)
+    clearAll(UsedModel.self)
+  }
+
   func removePresetPrompts() throws {
     try delete(model: Prompt.self, where: #Predicate<Prompt> { $0.preset })
   }

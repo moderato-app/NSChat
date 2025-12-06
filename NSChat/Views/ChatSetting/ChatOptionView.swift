@@ -10,10 +10,6 @@ struct ChatOptionView: View {
     self.chatOption = chatOption
   }
 
-  private var selectedModel: ModelEntity? {
-    allModels.first { $0.id == chatOption.model?.id }
-  }
-
   var body: some View {
     // let _ = Self.printChagesWhenDebug()
     Group {
@@ -32,7 +28,7 @@ struct ChatOptionView: View {
         HStack {
           Label("Model", systemImage: "book")
           Spacer()
-          if let model = selectedModel {
+          if let model = chatOption.model {
             VStack(alignment: .trailing, spacing: 2) {
               Text(model.resolvedName)
                 .foregroundColor(.secondary)
@@ -40,9 +36,6 @@ struct ChatOptionView: View {
                 .font(.caption2)
                 .foregroundColor(Color(uiColor: .tertiaryLabel))
             }
-          } else {
-            Text(chatOption.model?.resolvedName ?? "")
-              .foregroundColor(.secondary)
           }
         }
       }
