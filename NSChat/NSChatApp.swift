@@ -1,7 +1,7 @@
+import os
 import SwiftData
 import SwiftUI
 import TipKit
-import os
 
 let bundleName = Bundle.main.bundleIdentifier ?? "app.moderato.Chato.Chato"
 
@@ -20,11 +20,16 @@ struct NSChat: App {
     }
   }
 
+  let container = ModelContainer.product()
+
   var body: some Scene {
     WindowGroup {
       ContentView()
+        .task {
+          QueueService.shared.initialize(modelContainer: container)
+        }
     }
-    .modelContainer(ModelContainer.product())
+    .modelContainer(container)
     #if os(macOS)
       .commands {
         SidebarCommands()
