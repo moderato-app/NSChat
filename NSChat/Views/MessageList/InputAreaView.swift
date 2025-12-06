@@ -77,7 +77,7 @@ struct InputAreaView: View {
           }
           .contextMenu {
             let count = chat.messages.count
-            Section("Send with context length") {
+            Section("History Messages") {
               if count >= 20 {
                 Menu {
                   if count >= 20 { Button("20") { send(20) }}
@@ -100,7 +100,6 @@ struct InputAreaView: View {
             }
           }
           .disabled(chat.option.model == nil)
-          .popoverTip(SendButtonTip.instance, arrowEdge: .top)
       }
     }
     .padding(EdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 4))

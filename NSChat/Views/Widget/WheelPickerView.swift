@@ -55,7 +55,6 @@ struct WheelPickerView: View {
         Label(name, systemImage: systemImage)
           .foregroundStyle(.primary)
           .modifier(RippleEffect(at: .zero, trigger: rippleTrigger))
-          .popoverTip(AdvancedOptionDoubleTapTip.instance)
 
         Spacer()
         HStack(alignment: .lastTextBaseline, spacing: 5) {
