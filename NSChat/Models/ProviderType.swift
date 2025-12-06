@@ -42,4 +42,21 @@ enum ProviderType: Int32, Codable, CaseIterable {
     case .mock: return "Mock"
     }
   }
+  
+  var openRouterPrefix: String? {
+    switch self {
+    case .openAI: return "openai"
+    case .gemini: return "google"
+    case .anthropic: return "anthropic"
+    case .groq: return "groq"
+    case .perplexity: return "perplexity"
+    case .mistral: return "mistralai"
+    case .deepSeek: return "deepseek"
+    case .fireworksAI: return "fireworks"
+    case .togetherAI: return "together"
+    case .openRouter: return nil
+    // These providers don't have models listed on OpenRouter with matching prefixes
+    case .stabilityAI, .deepL, .replicate, .elevenLabs, .fal, .eachAI, .brave, .mock: return nil
+    }
+  }
 }

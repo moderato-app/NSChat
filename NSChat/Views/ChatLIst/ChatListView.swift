@@ -73,6 +73,11 @@ struct ChatListView: View {
           emptyProviderCard()
         }
         .listSectionSeparator(.hidden)
+      } else if chats.isEmpty {
+        Section {
+          emptyChatCard()
+        }
+        .listSectionSeparator(.hidden)
       }
 
       ForEach(chats, id: \.persistentModelID) { chat in
@@ -245,6 +250,19 @@ struct ChatListView: View {
   func emptyProviderCard() -> some View {
     EmptyProviderCard {
       isAddProviderPresented = true
+    }
+    .background {
+      RoundedRectangle(cornerRadius: 12)
+        .fill(Color(uiColor: .secondarySystemBackground))
+    }
+    .listRowBackground(Color.clear)
+    .listRowSeparator(.hidden)
+  }
+
+  @ViewBuilder
+  func emptyChatCard() -> some View {
+    EmptyChatCard {
+      isNewChatPresented = true
     }
     .background {
       RoundedRectangle(cornerRadius: 12)
