@@ -489,34 +489,8 @@ extension ChatDetailVC {
 // MARK: - Magic Scroll
 
 extension ChatDetailVC {
-  private func applyMagicScrollEffects() {
-    guard pref?.magicScrolling == true else {
-      resetAllCellTransforms()
-      return
-    }
-
-    let screenHeight = UIScreen.main.bounds.height
-
-    for cell in collectionView.visibleCells {
-      guard let messageCell = cell as? MessageCell else { continue }
-
-      let cellFrame = cell.frame
-      let frameInView = collectionView.convert(cellFrame, to: view)
-      let minY = frameInView.minY
-
-      messageCell.applyMagicScrollEffect(
-        minY: minY,
-        cellHeight: cellFrame.height,
-        screenHeight: screenHeight
-      )
-    }
-  }
-
-  private func resetAllCellTransforms() {
-    for cell in collectionView.visibleCells {
-      (cell as? MessageCell)?.resetTransform()
-    }
-  }
+  // 3D scrolling feature has been removed due to performance issues
+  // Configuration option remains available in settings but has no effect
 }
 
 // MARK: - Input Actions
@@ -651,7 +625,6 @@ extension ChatDetailVC {
 extension ChatDetailVC: UICollectionViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     updateShowToBottomButton()
-    applyMagicScrollEffects()
   }
 }
 
