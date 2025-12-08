@@ -1,115 +1,96 @@
+import SwiftData
 import SwiftUI
-import VisualEffectView
+
+// MARK: - ChatDetailView
 
 struct ChatDetailView: View {
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject private var em: EM
+  @EnvironmentObject private var pref: Pref
+
+  @State private var isInfoPresented = false
+  @State private var isPromptPresented = false
   @State private var isSettingPresented = false
 
   let chat: Chat
 
-  var visualTint: Color {
-    colorScheme == .dark ? .black : .white
-  }
-
   var body: some View {
-    //    let _ = Self.printChagesWhenDebug()
-    ChatDetail(chat: chat)
-      .toolbarBackground(.hidden, for: .automatic)
-      .safeAreaInset(edge: .top, spacing: 0) {
-        VisualEffect(colorTint: visualTint, colorTintAlpha: 0.5, blurRadius: 18, scale: 1)
-          .ignoresSafeArea(edges: .top)
-          .frame(height: 0)
-      }
-      .toolbar {
-        ToolbarTitleMenu {
-          Section {
-            Button {
-              isSettingPresented.toggle()
-            } label: {
-              HStack {
-                Text("Settings")
-                Image(systemName: "gear")
-              }
+    ChatDetailRepresentable(
+      chat: chat,
+      em: em,
+      pref: pref,
+      modelContext: modelContext,
+      onPresentInfo: { isInfoPresented = true },
+      onPresentPrompt: { isPromptPresented = true }
+    )
+    .ignoresSafeArea(.keyboard)
+    .toolbarBackground(.hidden, for: .automatic)
+    .toolbar {
+      ToolbarTitleMenu {
+        Section {
+          Button {
+            isSettingPresented.toggle()
+          } label: {
+            HStack {
+              Text("Settings")
+              Image(systemName: "gear")
             }
           }
         }
       }
-      .sheet(isPresented: $isSettingPresented) {
-        SettingView()
-          .preferredColorScheme(colorScheme)
-          .presentationDetents([.large])
+    }
+    .sheet(isPresented: $isInfoPresented) {
+      ChatInfoView(chat: chat)
+        .presentationDetents([.large])
+    }
+    .sheet(isPresented: $isPromptPresented) {
+      NavigationStack {
+        if let p = chat.option.prompt {
+          PromptEditorView(p)
+            .toolbar { Button("OK") { isPromptPresented.toggle() } }
+        } else {
+          PromptCreateView { p in
+            chat.option.prompt = p
+          }
+        }
       }
+      .presentationDetents([.large])
+    }
+    .sheet(isPresented: $isSettingPresented) {
+      SettingView()
+        .preferredColorScheme(colorScheme)
+        .presentationDetents([.large])
+    }
   }
 }
 
-private struct ChatDetail: View {
+// MARK: - ChatDetailRepresentable
+
+struct ChatDetailRepresentable: UIViewControllerRepresentable {
   let chat: Chat
+  let em: EM
+  let pref: Pref
+  let modelContext: ModelContext
+  let onPresentInfo: () -> Void
+  let onPresentPrompt: () -> Void
 
-  @EnvironmentObject var em: EM
-  @State private var isInfoPresented = false
-  @State private var isPromptPresented = false
-
-  init(chat: Chat) {
-    self.chat = chat
+  func makeUIViewController(context: Context) -> ChatDetailVC {
+    let vc = ChatDetailVC(chat: chat)
+    vc.configure(em: em, pref: pref, modelContext: modelContext)
+    vc.onPresentInfo = onPresentInfo
+    vc.onPresentPrompt = onPresentPrompt
+    return vc
   }
 
-  var body: some View {
-    //    let _ = Self._printChanges()
-    MessageList(chat: chat)
-      .softFeedback(isPromptPresented, isInfoPresented)
-      .toolbar {
-        ToolbarItem(placement: .automatic) {
-          HStack(spacing: 0) {
-            Button {
-              self.isPromptPresented.toggle()
-            } label: {
-              PromptIcon(chatOption: chat.option)
-                .tint(.secondary)
-            }
-            .sheet(isPresented: $isPromptPresented) {
-              NavigationStack {
-                if let p = chat.option.prompt {
-                  PromptEditorView(p)
-                    .toolbar { Button("OK") { isPromptPresented.toggle() } }
-                } else {
-                  PromptCreateView { p in
-                    chat.option.prompt = p
-                  }
-                }
-              }
-              .presentationDetents([.large])
-            }.hidden()
-
-            Button("", systemImage: "ellipsis.circle") {
-              self.isInfoPresented.toggle()
-            }
-            .sheet(isPresented: $isInfoPresented) {
-              ChatInfoView(chat: chat)
-                .presentationDetents([.large])
-            }
-          }
-        }
-      }
-      .onReceive(em.messageEvent) { event in
-        switch event {
-        case .new:
-          HapticsService.shared.shake(.light)
-        case .eof:
-          Task {
-            await sleepFor(0.2)
-            HapticsService.shared.shake(.success)
-          }
-        case .err:
-          Task {
-            await sleepFor(0.2)
-            HapticsService.shared.shake(.error)
-          }
-        case .countChanged:
-          break
-        }
-      }
+  func updateUIViewController(_ uiViewController: ChatDetailVC, context: Context) {
+    if uiViewController.chat.id != chat.id {
+      uiViewController.updateChat(chat)
+    }
   }
 }
+
+// MARK: - Preview
 
 #Preview {
   LovelyPreview {
