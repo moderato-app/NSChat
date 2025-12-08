@@ -10,10 +10,10 @@ final class ChatDetailVC: UIViewController {
   // MARK: - Properties
 
   private(set) var chat: Chat
-  private var messages: [Message] = []
-  private var total = 10
-  private var cancellables = Set<AnyCancellable>()
-  private var inputTextDebounceSubject = PassthroughSubject<String, Never>()
+  var messages: [Message] = []
+  var total = 10
+  var cancellables = Set<AnyCancellable>()
+  var inputTextDebounceSubject = PassthroughSubject<String, Never>()
 
   weak var em: EM?
   weak var pref: Pref?
@@ -24,7 +24,7 @@ final class ChatDetailVC: UIViewController {
 
   // MARK: - UI Components
 
-  private lazy var collectionView: UICollectionView = {
+  lazy var collectionView: UICollectionView = {
     let layout = createLayout()
     let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
     cv.backgroundColor = .clear
@@ -36,7 +36,7 @@ final class ChatDetailVC: UIViewController {
     return cv
   }()
 
-  private lazy var toBottomButton: UIButton = {
+  lazy var toBottomButton: UIButton = {
     let button = UIButton(type: .system)
     let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium)
     let image = UIImage(systemName: "chevron.down.circle.fill", withConfiguration: config)
@@ -55,7 +55,7 @@ final class ChatDetailVC: UIViewController {
     return button
   }()
 
-  private var showToBottomButton = false {
+  var showToBottomButton = false {
     didSet {
       guard showToBottomButton != oldValue else { return }
       UIView.animate(withDuration: 0.25) {
@@ -81,7 +81,7 @@ final class ChatDetailVC: UIViewController {
     return view
   }()
 
-  private lazy var inputToolbar: InputToolbar = {
+  lazy var inputToolbar: InputToolbar = {
     let toolbar = InputToolbar(chatOption: chat.option)
     toolbar.translatesAutoresizingMaskIntoConstraints = false
     toolbar.onInputTextChanged = { [weak self] text in
@@ -100,7 +100,7 @@ final class ChatDetailVC: UIViewController {
     return view
   }()
 
-  private lazy var inputTextField: UITextField = {
+  lazy var inputTextField: UITextField = {
     let textField = UITextField()
     textField.placeholder = "Message"
     textField.font = .preferredFont(forTextStyle: .body)
@@ -111,7 +111,7 @@ final class ChatDetailVC: UIViewController {
     return textField
   }()
 
-  private lazy var sendButton: UIButton = {
+  lazy var sendButton: UIButton = {
     var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: "arrow.up.circle.fill")
     config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .bold)
@@ -122,19 +122,18 @@ final class ChatDetailVC: UIViewController {
     button.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
     button.isHidden = true
 
-    // Add context menu for history selection
     button.showsMenuAsPrimaryAction = false
     button.menu = buildSendMenu()
 
     return button
   }()
 
-  private var inputContainerBottomConstraint: NSLayoutConstraint?
-  private var toBottomButtonBottomConstraint: NSLayoutConstraint?
+  var inputContainerBottomConstraint: NSLayoutConstraint?
+  var toBottomButtonBottomConstraint: NSLayoutConstraint?
 
   // MARK: - Data Source
 
-  private var dataSource: UICollectionViewDiffableDataSource<Section, Message.ID>!
+  var dataSource: UICollectionViewDiffableDataSource<Section, PersistentIdentifier>!
 
   enum Section {
     case main
@@ -186,11 +185,8 @@ final class ChatDetailVC: UIViewController {
   private func setupUI() {
     view.backgroundColor = .systemBackground
 
-    // Add collection view
     view.addSubview(collectionView)
     view.addSubview(toBottomButton)
-
-    // Add input container
     view.addSubview(inputContainerView)
     inputContainerView.addSubview(blurEffectView)
     inputContainerView.addSubview(inputToolbar)
@@ -243,7 +239,6 @@ final class ChatDetailVC: UIViewController {
       sendButton.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    // Tap gesture to dismiss keyboard
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     tapGesture.cancelsTouchesInView = false
     collectionView.addGestureRecognizer(tapGesture)
@@ -289,7 +284,7 @@ final class ChatDetailVC: UIViewController {
   }
 
   private func setupDataSource() {
-    let cellRegistration = UICollectionView.CellRegistration<MessageCell, Message.ID> { [weak self] cell, _, messageID in
+    let cellRegistration = UICollectionView.CellRegistration<MessageCell, PersistentIdentifier> { [weak self] cell, _, messageID in
       guard let self = self,
             let message = self.messages.first(where: { $0.id == messageID }),
             let em = self.em,
@@ -301,25 +296,10 @@ final class ChatDetailVC: UIViewController {
       }
     }
 
-    dataSource = UICollectionViewDiffableDataSource<Section, Message.ID>(collectionView: collectionView) {
+    dataSource = UICollectionViewDiffableDataSource<Section, PersistentIdentifier>(collectionView: collectionView) {
       collectionView, indexPath, identifier in
       collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
     }
-  }
-
-  private func setupKeyboardObservers() {
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(keyboardWillShow),
-      name: UIResponder.keyboardWillShowNotification,
-      object: nil
-    )
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(keyboardWillHide),
-      name: UIResponder.keyboardWillHideNotification,
-      object: nil
-    )
   }
 
   private func setupInputDebounce() {
@@ -330,255 +310,9 @@ final class ChatDetailVC: UIViewController {
       }
       .store(in: &cancellables)
   }
-}
 
-// MARK: - Data Loading
+  // MARK: - Navigation Actions
 
-extension ChatDetailVC {
-  private func loadMessages() {
-    messages = chat.messages
-      .sorted { $0.createdAt > $1.createdAt }
-      .prefix(total)
-      .reversed()
-
-    applySnapshot(animatingDifferences: false)
-  }
-
-  func reloadMessages(animated: Bool = true) {
-    total = 10
-    loadMessages()
-    if animated {
-      applySnapshot(animatingDifferences: true)
-    }
-  }
-
-  private func applySnapshot(animatingDifferences: Bool) {
-    var snapshot = NSDiffableDataSourceSnapshot<Section, Message.ID>()
-    snapshot.appendSections([.main])
-    snapshot.appendItems(messages.map { $0.id }, toSection: .main)
-    dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
-  }
-
-  private func onMsgCountChange() {
-    let animated = total <= 20
-    total = 10
-
-    Task { @MainActor in
-      try? await Task.sleep(for: .seconds(0.05))
-      self.loadMessages()
-      self.applySnapshot(animatingDifferences: animated)
-
-      try? await Task.sleep(for: .seconds(1))
-      self.loadMessages()
-      self.applySnapshot(animatingDifferences: animated)
-    }
-  }
-
-  private func loadInputText() {
-    inputTextField.text = chat.input
-    updateSendButton()
-    inputToolbar.updateInputText(chat.input)
-  }
-
-  private func saveInputText() {
-    chat.input = inputTextField.text ?? ""
-  }
-}
-
-// MARK: - Events
-
-extension ChatDetailVC {
-  private func subscribeToEvents() {
-    guard let em = em else { return }
-
-    em.messageEvent
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] event in
-        self?.handleMessageEvent(event)
-      }
-      .store(in: &cancellables)
-
-    em.reUseTextEvent
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] text in
-        self?.handleReuseText(text)
-      }
-      .store(in: &cancellables)
-  }
-
-  private func handleMessageEvent(_ event: MessageEventType) {
-    switch event {
-    case .new:
-      onMsgCountChange()
-      scrollToBottom(animated: true)
-      HapticsService.shared.shake(.light)
-    case .countChanged:
-      onMsgCountChange()
-    case .eof:
-      var snapshot = dataSource.snapshot()
-      snapshot.reconfigureItems(snapshot.itemIdentifiers)
-      dataSource.apply(snapshot, animatingDifferences: false)
-      Task {
-        await sleepFor(0.2)
-        HapticsService.shared.shake(.success)
-      }
-    case .err:
-      var snapshot = dataSource.snapshot()
-      snapshot.reconfigureItems(snapshot.itemIdentifiers)
-      dataSource.apply(snapshot, animatingDifferences: false)
-      Task {
-        await sleepFor(0.2)
-        HapticsService.shared.shake(.error)
-      }
-    }
-  }
-
-  private func handleReuseText(_ text: String) {
-    guard !text.isEmpty else { return }
-
-    var currentText = inputTextField.text ?? ""
-
-    if currentText.hasSuffix(text + " ") {
-      currentText.removeLast((text + " ").count)
-    } else if currentText.hasSuffix(text) {
-      currentText.removeLast(text.count)
-    } else {
-      if !currentText.isEmpty, let last = currentText.last, !["\n", " ", "\t"].contains(last) {
-        currentText += " "
-      }
-      currentText += text
-    }
-
-    inputTextField.text = currentText
-    updateSendButton()
-    inputToolbar.updateInputText(currentText)
-  }
-}
-
-// MARK: - Scrolling
-
-extension ChatDetailVC {
-  func scrollToBottom(animated: Bool) {
-    guard !messages.isEmpty else { return }
-    let lastIndex = IndexPath(item: messages.count - 1, section: 0)
-    collectionView.scrollToItem(at: lastIndex, at: .bottom, animated: animated)
-  }
-
-  @objc private func scrollToBottomTapped() {
-    scrollToBottom(animated: true)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-      HapticsService.shared.shake(.light)
-    }
-  }
-
-  private func updateShowToBottomButton() {
-    let contentHeight = collectionView.contentSize.height
-    let containerHeight = collectionView.bounds.height
-    let contentOffsetY = collectionView.contentOffset.y
-
-    let distanceToBottom = contentHeight - (contentOffsetY + containerHeight)
-    let threshold = containerHeight * 1.5
-    let shouldShow = distanceToBottom >= threshold
-
-    if shouldShow != showToBottomButton {
-      showToBottomButton = shouldShow
-    }
-  }
-}
-
-// MARK: - Magic Scroll
-
-extension ChatDetailVC {
-  // 3D scrolling feature has been removed due to performance issues
-  // Configuration option remains available in settings but has no effect
-}
-
-// MARK: - Input Actions
-
-extension ChatDetailVC {
-  @objc private func textFieldDidChange() {
-    let text = inputTextField.text ?? ""
-    updateSendButton()
-    inputToolbar.updateInputText(text)
-    inputTextDebounceSubject.send(text)
-  }
-
-  private func updateSendButton() {
-    let hasText = !(inputTextField.text ?? "").isEmpty
-    let hasModel = chat.option.model != nil
-
-    UIView.animate(withDuration: 0.2) {
-      self.sendButton.isHidden = !hasText
-      self.sendButton.isEnabled = hasModel
-    }
-
-    sendButton.menu = buildSendMenu()
-  }
-
-  @objc private func sendTapped() {
-    send(chat.option.contextLength)
-  }
-
-  private func send(_ contextLength: Int) {
-    guard let model = chat.option.model,
-          let text = inputTextField.text,
-          !text.isEmpty,
-          let modelContext = modelContext,
-          let em = em
-    else { return }
-
-    inputTextField.text = ""
-    updateSendButton()
-    inputToolbar.updateInputText("")
-    inputTextField.resignFirstResponder()
-
-    ChatSendService.shared.sendMessage(
-      text: text,
-      chat: chat,
-      contextLength: contextLength,
-      model: model,
-      modelContext: modelContext,
-      em: em
-    )
-  }
-
-  private func buildSendMenu() -> UIMenu {
-    let count = chat.messages.count
-    var actions: [UIAction] = []
-
-    if count >= 20 {
-      // Show limited options for large message counts
-      for i in [0, 1, 2, 3, 4, 6, 8, 10].reversed() {
-        actions.append(UIAction(title: "\(i)") { [weak self] _ in
-          self?.send(i)
-        })
-      }
-      actions.append(UIAction(title: "20") { [weak self] _ in self?.send(20) })
-      if count >= 50 {
-        actions.append(UIAction(title: "50") { [weak self] _ in self?.send(50) })
-      }
-      actions.append(UIAction(title: "\(count) (all)") { [weak self] _ in self?.send(count) })
-    } else {
-      for i in (0 ... min(count, 10)).reversed() {
-        let title = i == count ? "\(i) (all)" : "\(i)"
-        actions.append(UIAction(title: title) { [weak self] _ in self?.send(i) })
-      }
-      if count > 10 {
-        actions.insert(UIAction(title: "\(count) (all)") { [weak self] _ in self?.send(count) }, at: 0)
-      }
-    }
-
-    return UIMenu(title: "History Messages", children: actions)
-  }
-
-  @objc private func dismissKeyboard() {
-    view.endEditing(true)
-  }
-}
-
-// MARK: - Navigation Actions
-
-extension ChatDetailVC {
   @objc private func infoTapped() {
     onPresentInfo?()
     HapticsService.shared.shake(.light)
@@ -592,48 +326,3 @@ extension ChatDetailVC {
     inputToolbar.reloadData()
   }
 }
-
-// MARK: - Keyboard Handling
-
-extension ChatDetailVC {
-  @objc private func keyboardWillShow(_ notification: Notification) {
-    guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-    else { return }
-
-    let keyboardHeight = keyboardFrame.height
-    inputContainerBottomConstraint?.constant = -keyboardHeight + view.safeAreaInsets.bottom
-
-    UIView.animate(withDuration: duration) {
-      self.view.layoutIfNeeded()
-    }
-  }
-
-  @objc private func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
-
-    inputContainerBottomConstraint?.constant = 0
-
-    UIView.animate(withDuration: duration) {
-      self.view.layoutIfNeeded()
-    }
-  }
-}
-
-// MARK: - UICollectionViewDelegate
-
-extension ChatDetailVC: UICollectionViewDelegate {
-  func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    updateShowToBottomButton()
-  }
-}
-
-// MARK: - UITextFieldDelegate
-
-extension ChatDetailVC: UITextFieldDelegate {
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    send(chat.option.contextLength)
-    return true
-  }
-}
-
