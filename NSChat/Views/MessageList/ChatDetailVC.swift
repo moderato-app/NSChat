@@ -165,7 +165,6 @@ final class ChatDetailVC: UIViewController {
     setupUI()
     setupNavigationBar()
     setupDataSource()
-    setupKeyboardObservers()
     setupInputDebounce()
     setupTraitObservers()
     loadMessages()
@@ -177,7 +176,6 @@ final class ChatDetailVC: UIViewController {
     super.viewDidAppear(animated)
     scrollToBottom(animated: false)
   }
-
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
@@ -192,14 +190,16 @@ final class ChatDetailVC: UIViewController {
     view.addSubview(collectionView)
     view.addSubview(inputContainerView)
     view.addSubview(toBottomButton)
+    
     inputContainerView.addSubview(blurEffectView)
     inputContainerView.addSubview(topSeparatorView)
     inputContainerView.addSubview(inputToolbar)
     inputContainerView.addSubview(inputWrapperView)
+    
     inputWrapperView.addSubview(inputTextField)
     inputWrapperView.addSubview(sendButton)
-
-    toBottomButtonBottomConstraint = toBottomButton.bottomAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: -15)
+    
+    toBottomButtonBottomConstraint = toBottomButton.bottomToTop(of: inputContainerView,offset: -15)
 
     // Use keyboardLayoutGuide for proper keyboard handling (iOS 15+)
     NSLayoutConstraint.activate([
