@@ -130,6 +130,7 @@ final class ChatDetailVC: UIViewController {
   }()
 
   var inputContainerBottomConstraint: NSLayoutConstraint?
+  var inputWrapperBottomConstraint: NSLayoutConstraint?
   var toBottomButtonBottomConstraint: NSLayoutConstraint?
 
   // MARK: - Data Source
@@ -172,6 +173,14 @@ final class ChatDetailVC: UIViewController {
     scrollToBottom(animated: false)
   }
 
+  override func viewSafeAreaInsetsDidChange() {
+    super.viewSafeAreaInsetsDidChange()
+    // Update input wrapper bottom constraint when safe area changes (and keyboard is not shown)
+    if inputContainerBottomConstraint?.constant == 0 {
+      inputWrapperBottomConstraint?.constant = -(view.safeAreaInsets.bottom + 12)
+    }
+  }
+
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     saveInputText()
@@ -192,6 +201,7 @@ final class ChatDetailVC: UIViewController {
     inputWrapperView.addSubview(sendButton)
 
     inputContainerBottomConstraint = inputContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    inputWrapperBottomConstraint = inputWrapperView.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -12)
     toBottomButtonBottomConstraint = toBottomButton.bottomAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: -15)
 
     NSLayoutConstraint.activate([
@@ -222,7 +232,7 @@ final class ChatDetailVC: UIViewController {
       inputWrapperView.topAnchor.constraint(equalTo: inputToolbar.bottomAnchor, constant: 6),
       inputWrapperView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 8),
       inputWrapperView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -8),
-      inputWrapperView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
+      inputWrapperBottomConstraint!,
 
       inputTextField.topAnchor.constraint(equalTo: inputWrapperView.topAnchor, constant: 8),
       inputTextField.leadingAnchor.constraint(equalTo: inputWrapperView.leadingAnchor, constant: 12),
