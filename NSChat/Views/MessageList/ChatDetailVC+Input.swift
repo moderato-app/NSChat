@@ -19,7 +19,12 @@ extension ChatDetailVC {
       self.sendButton.isHidden = !hasText
       self.sendButton.isEnabled = hasModel
     }
+  }
 
+  func updateSendMenuIfNeeded() {
+    let currentCount = chat.messages.count
+    guard currentCount != lastMessageCount else { return }
+    lastMessageCount = currentCount
     sendButton.menu = buildSendMenu()
   }
 
@@ -64,14 +69,14 @@ extension ChatDetailVC {
       if count >= 50 {
         actions.append(UIAction(title: "50") { [weak self] _ in self?.send(50) })
       }
-      actions.append(UIAction(title: "\(count) (all)") { [weak self] _ in self?.send(count) })
+      actions.append(UIAction(title: "(all) \(count)") { [weak self] _ in self?.send(count) })
     } else {
       for i in (0 ... min(count, 10)).reversed() {
-        let title = i == count ? "\(i) (all)" : "\(i)"
+        let title = i == count ? "(all) \(i)" : "\(i)"
         actions.append(UIAction(title: title) { [weak self] _ in self?.send(i) })
       }
       if count > 10 {
-        actions.insert(UIAction(title: "\(count) (all)") { [weak self] _ in self?.send(count) }, at: 0)
+        actions.insert(UIAction(title: "(all) \(count)") { [weak self] _ in self?.send(count) }, at: 0)
       }
     }
 

@@ -15,6 +15,7 @@ final class ChatDetailVC: UIViewController {
   var total = 10
   var cancellables = Set<AnyCancellable>()
   var inputTextDebounceSubject = PassthroughSubject<String, Never>()
+  var lastMessageCount = 0
 
   weak var em: EM?
   weak var pref: Pref?
@@ -115,7 +116,6 @@ final class ChatDetailVC: UIViewController {
     textField.font = .preferredFont(forTextStyle: .body)
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.delegate = self
-    textField.returnKeyType = .send
     textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     return textField
   }()
@@ -132,7 +132,6 @@ final class ChatDetailVC: UIViewController {
     button.isHidden = true
 
     button.showsMenuAsPrimaryAction = false
-    button.menu = buildSendMenu()
 
     return button
   }()

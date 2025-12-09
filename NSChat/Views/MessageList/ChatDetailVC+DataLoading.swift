@@ -12,6 +12,7 @@ extension ChatDetailVC {
       .reversed()
 
     applySnapshot(animatingDifferences: false)
+    updateSendMenuIfNeeded()
   }
 
   func reloadMessages(animated: Bool = true) {
