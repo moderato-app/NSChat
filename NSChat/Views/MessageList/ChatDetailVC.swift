@@ -60,12 +60,19 @@ final class ChatDetailVC: UIViewController {
   var showToBottomButton = false {
     didSet {
       guard showToBottomButton != oldValue else { return }
-      UIView.animate(withDuration: 0.25) {
-        self.toBottomButton.alpha = self.showToBottomButton ? 1 : 0
-        self.toBottomButton.transform = self.showToBottomButton
-          ? .identity
-          : CGAffineTransform(scaleX: 0, y: 0)
-      }
+      animateToBottomButtonVisibility(showToBottomButton)
+    }
+  }
+
+  private func animateToBottomButtonVisibility(_ show: Bool) {
+    toBottomButton.layer.removeAllAnimations()
+    UIView.animate(
+      withDuration: 0.25,
+      delay: 0,
+      options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction]
+    ) {
+      self.toBottomButton.alpha = show ? 1 : 0
+      self.toBottomButton.transform = show ? .identity : CGAffineTransform(scaleX: 0.01, y: 0.01)
     }
   }
 
