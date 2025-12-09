@@ -4,6 +4,7 @@ import SwiftData
 import SwiftUI
 import UIKit
 import TinyConstraints
+import Then
 
 // MARK: - ChatDetailVC
 
@@ -39,17 +40,7 @@ final class ChatDetailVC: UIViewController {
   }()
 
   lazy var toBottomButton: UIButton = {
-    let button = UIButton(type: .system)
-    let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium)
-    let image = UIImage(systemName: "chevron.down.circle.fill", withConfiguration: config)
-    button.setImage(image, for: .normal)
-    button.tintColor = .systemGray
-    button.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.8)
-    button.layer.cornerRadius = 20
-    button.layer.shadowColor = UIColor.black.cgColor
-    button.layer.shadowOffset = CGSize(width: 0, height: 2)
-    button.layer.shadowRadius = 4
-    button.layer.shadowOpacity = 0.15
+    let button = ToBottomButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.addTarget(self, action: #selector(scrollToBottomTapped), for: .touchUpInside)
     button.alpha = 0

@@ -85,7 +85,7 @@ final class MessageCell: UICollectionViewCell {
 
   private func applyBlur(radius: CGFloat) {
     if radius > 0.5 {
-      if let existingBlur = contentView.layer.filters as? [Any],
+      if let existingBlur = contentView.layer.filters,
          let gaussianBlur = existingBlur.first as? NSObject,
          gaussianBlur.responds(to: NSSelectorFromString("inputRadius"))
       {
