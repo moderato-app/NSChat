@@ -4,57 +4,11 @@ import UIKit
 
 extension ChatDetailVC {
   func setupKeyboardObservers() {
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(keyboardWillShow),
-      name: UIResponder.keyboardWillShowNotification,
-      object: nil
-    )
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(keyboardWillHide),
-      name: UIResponder.keyboardWillHideNotification,
-      object: nil
-    )
-  }
+    // Using keyboardLayoutGuide (iOS 15+) - constraints are handled automatically
+    // The inputContainerView.bottomAnchor is constrained to view.keyboardLayoutGuide.topAnchor
+    // which automatically animates with keyboard appearance/disappearance
 
-  @objc func keyboardWillShow(_ notification: Notification) {
-    guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-          let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
-          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
-    else { return }
-
-    let keyboardHeight = keyboardFrame.height
-    inputContainerBottomConstraint?.constant = -keyboardHeight
-    // When keyboard is shown, just need padding (keyboard replaces safe area)
-    inputWrapperBottomConstraint?.constant = -12
-
-    UIView.animate(
-      withDuration: duration,
-      delay: 0,
-      options: UIView.AnimationOptions(rawValue: curve << 16),
-      animations: {
-        self.view.layoutIfNeeded()
-      }
-    )
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
-          let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
-    else { return }
-
-    inputContainerBottomConstraint?.constant = 0
-    // When keyboard is hidden, need safe area padding + extra padding
-    inputWrapperBottomConstraint?.constant = -(view.safeAreaInsets.bottom + 12)
-
-    UIView.animate(
-      withDuration: duration,
-      delay: 0,
-      options: UIView.AnimationOptions(rawValue: curve << 16),
-      animations: {
-        self.view.layoutIfNeeded()
-      }
-    )
+    // Configure keyboard layout guide to use safe area when keyboard is hidden
+    view.keyboardLayoutGuide.usesBottomSafeArea = true
   }
 }

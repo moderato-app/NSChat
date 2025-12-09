@@ -76,8 +76,15 @@ final class ChatDetailVC: UIViewController {
   }()
 
   private lazy var blurEffectView: UIVisualEffectView = {
-    let blurEffect = UIBlurEffect(style: .systemThinMaterial)
+    let blurEffect = UIBlurEffect(style: .systemMaterial)
     let view = UIVisualEffectView(effect: blurEffect)
+    view.translatesAutoresizingMaskIntoConstraints = false
+    return view
+  }()
+
+  private lazy var topSeparatorView: UIView = {
+    let view = UIView()
+    view.backgroundColor = .separator
     view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
@@ -95,9 +102,10 @@ final class ChatDetailVC: UIViewController {
   private lazy var inputWrapperView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.layer.cornerRadius = 15
+    view.backgroundColor = .secondarySystemBackground
+    view.layer.cornerRadius = 18
     view.layer.borderWidth = 0.5
-    view.layer.borderColor = UIColor.secondaryLabel.withAlphaComponent(0.5).cgColor
+    view.layer.borderColor = UIColor.separator.cgColor
     return view
   }()
 
@@ -129,8 +137,6 @@ final class ChatDetailVC: UIViewController {
     return button
   }()
 
-  var inputContainerBottomConstraint: NSLayoutConstraint?
-  var inputWrapperBottomConstraint: NSLayoutConstraint?
   var toBottomButtonBottomConstraint: NSLayoutConstraint?
 
   // MARK: - Data Source
@@ -173,13 +179,6 @@ final class ChatDetailVC: UIViewController {
     scrollToBottom(animated: false)
   }
 
-  override func viewSafeAreaInsetsDidChange() {
-    super.viewSafeAreaInsetsDidChange()
-    // Update input wrapper bottom constraint when safe area changes (and keyboard is not shown)
-    if inputContainerBottomConstraint?.constant == 0 {
-      inputWrapperBottomConstraint?.constant = -(view.safeAreaInsets.bottom + 12)
-    }
-  }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
@@ -192,18 +191,18 @@ final class ChatDetailVC: UIViewController {
     view.backgroundColor = .systemBackground
 
     view.addSubview(collectionView)
-    view.addSubview(toBottomButton)
     view.addSubview(inputContainerView)
+    view.addSubview(toBottomButton)
     inputContainerView.addSubview(blurEffectView)
+    inputContainerView.addSubview(topSeparatorView)
     inputContainerView.addSubview(inputToolbar)
     inputContainerView.addSubview(inputWrapperView)
     inputWrapperView.addSubview(inputTextField)
     inputWrapperView.addSubview(sendButton)
 
-    inputContainerBottomConstraint = inputContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-    inputWrapperBottomConstraint = inputWrapperView.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -12)
     toBottomButtonBottomConstraint = toBottomButton.bottomAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: -15)
 
+    // Use keyboardLayoutGuide for proper keyboard handling (iOS 15+)
     NSLayoutConstraint.activate([
       collectionView.topAnchor.constraint(equalTo: view.topAnchor),
       collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -215,16 +214,24 @@ final class ChatDetailVC: UIViewController {
       toBottomButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
       toBottomButtonBottomConstraint!,
 
+      // Input container uses keyboardLayoutGuide for keyboard-aware positioning
       inputContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       inputContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      inputContainerBottomConstraint!,
+      inputContainerView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
 
+      // Blur effect fills the input container and extends to bottom of screen
       blurEffectView.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
       blurEffectView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
       blurEffectView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor),
       blurEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-      inputToolbar.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
+      // Top separator line
+      topSeparatorView.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
+      topSeparatorView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
+      topSeparatorView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor),
+      topSeparatorView.heightAnchor.constraint(equalToConstant: 1.0 / UIScreen.main.scale),
+
+      inputToolbar.topAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: 6),
       inputToolbar.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 18),
       inputToolbar.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -18),
       inputToolbar.heightAnchor.constraint(equalToConstant: 32),
@@ -232,7 +239,7 @@ final class ChatDetailVC: UIViewController {
       inputWrapperView.topAnchor.constraint(equalTo: inputToolbar.bottomAnchor, constant: 6),
       inputWrapperView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 8),
       inputWrapperView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -8),
-      inputWrapperBottomConstraint!,
+      inputWrapperView.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -12),
 
       inputTextField.topAnchor.constraint(equalTo: inputWrapperView.topAnchor, constant: 8),
       inputTextField.leadingAnchor.constraint(equalTo: inputWrapperView.leadingAnchor, constant: 12),
@@ -253,6 +260,16 @@ final class ChatDetailVC: UIViewController {
 
   private func setupNavigationBar() {
     navigationItem.largeTitleDisplayMode = .never
+
+    // Setup navigation bar with blur effect
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithDefaultBackground()
+    appearance.backgroundEffect = UIBlurEffect(style: .systemMaterial)
+    appearance.backgroundColor = .clear
+
+    navigationController?.navigationBar.standardAppearance = appearance
+    navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    navigationController?.navigationBar.compactAppearance = appearance
 
     let infoButton = UIBarButtonItem(
       image: UIImage(systemName: "ellipsis.circle"),
@@ -320,7 +337,7 @@ final class ChatDetailVC: UIViewController {
 
   private func setupTraitObservers() {
     registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (viewController: Self, _) in
-      self?.inputWrapperView.layer.borderColor = UIColor.secondaryLabel.withAlphaComponent(0.5).cgColor
+      self?.inputWrapperView.layer.borderColor = UIColor.separator.cgColor
     }
   }
 
