@@ -3,6 +3,7 @@ import os
 import SwiftData
 import SwiftUI
 import UIKit
+import TinyConstraints
 
 // MARK: - ChatDetailVC
 
@@ -160,6 +161,7 @@ final class ChatDetailVC: UIViewController {
     setupDataSource()
     setupKeyboardObservers()
     setupInputDebounce()
+    setupTraitObservers()
     loadMessages()
     loadInputText()
     subscribeToEvents()
@@ -173,11 +175,6 @@ final class ChatDetailVC: UIViewController {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     saveInputText()
-  }
-
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    inputWrapperView.layer.borderColor = UIColor.secondaryLabel.withAlphaComponent(0.5).cgColor
   }
 
   // MARK: - Setup
@@ -277,7 +274,7 @@ final class ChatDetailVC: UIViewController {
     let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
 
     let section = NSCollectionLayoutSection(group: group)
-    section.interGroupSpacing = 0
+    section.interGroupSpacing = 17
     section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
 
     return UICollectionViewCompositionalLayout(section: section)
@@ -309,6 +306,12 @@ final class ChatDetailVC: UIViewController {
         self?.chat.input = value
       }
       .store(in: &cancellables)
+  }
+
+  private func setupTraitObservers() {
+    registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (viewController: Self, _) in
+      self?.inputWrapperView.layer.borderColor = UIColor.secondaryLabel.withAlphaComponent(0.5).cgColor
+    }
   }
 
   // MARK: - Navigation Actions

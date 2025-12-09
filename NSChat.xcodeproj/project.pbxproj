@@ -10,6 +10,8 @@
 		EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */ = {isa = PBXBuildFile; productRef = EB05DC9C2EE4BDC800D5654F /* SwiftQueue */; };
 		EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = EB1B46DE2EDAF0AD00FD053A /* AIProxy */; };
 		EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */ = {isa = PBXBuildFile; productRef = EB508AF92EE2187300D27F29 /* SystemNotification */; };
+		EB5770DF2EE87D43001DC55C /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = EB5770DE2EE87D43001DC55C /* TinyConstraints */; };
+		EB5770E22EE87D58001DC55C /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = EB5770E12EE87D58001DC55C /* Then */; };
 		EB8FB4F32C3940D60041833B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = EB8FB4F22C3940D60041833B /* MarkdownUI */; };
 		EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = EB9E72032BCAB7DF00D5B110 /* ConfettiSwiftUI */; };
 		EBA73E2F2CDD3006007E480C /* VisualEffectView in Frameworks */ = {isa = PBXBuildFile; productRef = EBA73E2E2CDD3006007E480C /* VisualEffectView */; };
@@ -61,11 +63,13 @@
 			files = (
 				EBCFF3952B6FF4CC00498E1E /* Throttler in Frameworks */,
 				EBA73E2F2CDD3006007E480C /* VisualEffectView in Frameworks */,
+				EB5770E22EE87D58001DC55C /* Then in Frameworks */,
 				EBB4EF292CDDC02200F38178 /* VisualEffectView in Frameworks */,
 				EB8FB4F32C3940D60041833B /* MarkdownUI in Frameworks */,
 				EBD0114C2B98F2840046F235 /* Haptico in Frameworks */,
 				EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */,
 				EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */,
+				EB5770DF2EE87D43001DC55C /* TinyConstraints in Frameworks */,
 				EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */,
 				EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */,
 			);
@@ -115,6 +119,8 @@
 				EB1B46DE2EDAF0AD00FD053A /* AIProxy */,
 				EB508AF92EE2187300D27F29 /* SystemNotification */,
 				EB05DC9C2EE4BDC800D5654F /* SwiftQueue */,
+				EB5770DE2EE87D43001DC55C /* TinyConstraints */,
+				EB5770E12EE87D58001DC55C /* Then */,
 			);
 			productName = NSChat;
 			productReference = EB1B51812EDB004800FD053A /* NSChat.app */;
@@ -154,6 +160,8 @@
 				EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */,
 				EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */,
 				EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */,
+				EB5770DD2EE87D43001DC55C /* XCRemoteSwiftPackageReference "TinyConstraints" */,
+				EB5770E02EE87D58001DC55C /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = EB6422072B6F7BB000119DE6;
 			projectDirPath = "";
@@ -443,6 +451,22 @@
 				minimumVersion = 1.4.0;
 			};
 		};
+		EB5770DD2EE87D43001DC55C /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roberthein/TinyConstraints.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.2;
+			};
+		};
+		EB5770E02EE87D58001DC55C /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		EB8FB4F12C3940D60041833B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui.git";
@@ -500,6 +524,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */;
 			productName = SystemNotification;
+		};
+		EB5770DE2EE87D43001DC55C /* TinyConstraints */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB5770DD2EE87D43001DC55C /* XCRemoteSwiftPackageReference "TinyConstraints" */;
+			productName = TinyConstraints;
+		};
+		EB5770E12EE87D58001DC55C /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB5770E02EE87D58001DC55C /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 		EB8FB4F22C3940D60041833B /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
