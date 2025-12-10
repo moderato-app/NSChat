@@ -5,6 +5,13 @@ extension SettingView {
   var newChatPreferenceSection: some View {
     Section {
       HStack {
+        Label("Generate Title", systemImage: "text.line.2.summary")
+          .modifier(RippleEffect(at: .zero, trigger: pref.autoGenerateTitle))
+        Toggle("", isOn: $pref.autoGenerateTitle)
+      }
+      .selectionFeedback(pref.autoGenerateTitle)
+
+      HStack {
         Label("History Messages", systemImage: "clock")
         Spacer()
         Picker("History Messages", selection: $pref.newChatPrefHistoryMessageCount) {
