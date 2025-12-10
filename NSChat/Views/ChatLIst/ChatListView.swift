@@ -15,7 +15,6 @@ struct ChatListView: View {
 
   @State private var settingsDetent = PresentationDetent.medium
   @State private var isSettingPresented = false
-  @State private var isNewChatPresented = false
   @State private var isAddProviderPresented = false
 
   @State var isDeleteConfirmPresented: Bool = false
@@ -42,20 +41,13 @@ struct ChatListView: View {
   var body: some View {
     list()
       .softFeedback(
-        editMode.isEditing, isAddProviderPresented, isNewChatPresented,
+        editMode.isEditing, isAddProviderPresented,
         isMultiDeleteConfirmPresented
       )
       .sheet(isPresented: $isSettingPresented) {
         SettingView()
           .preferredColorScheme(colorScheme)
           .presentationDetents([.large])
-      }
-      .sheet(isPresented: $isNewChatPresented) {
-        NewChatView()
-          .presentationDetents(
-            [.medium, .large],
-            selection: $settingsDetent
-          )
       }
       .sheet(isPresented: $isAddProviderPresented) {
         let provider = Provider(type: .openAI)
@@ -203,11 +195,6 @@ struct ChatListView: View {
         } label: {
           PlusIcon()
         }
-        .contextMenu {
-          Button("New Chat with Options") {
-            self.isNewChatPresented.toggle()
-          }
-        }
       }
     }
     ToolbarItem(placement: .bottomBar) {
@@ -262,7 +249,7 @@ struct ChatListView: View {
   @ViewBuilder
   func emptyChatCard() -> some View {
     EmptyChatCard {
-      isNewChatPresented = true
+      createAndNavigateToNewChat()
     }
     .background {
       RoundedRectangle(cornerRadius: 12)
