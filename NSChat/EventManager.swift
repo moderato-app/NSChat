@@ -13,7 +13,7 @@ class EM: ObservableObject {
 
   let chatOptionChanged = PassthroughSubject<Void, Never>()
 
-  let apiKeySubmitted = PassthroughSubject<PersistentIdentifier, Never>()
+  let shouldFetchModels = PassthroughSubject<PersistentIdentifier, Never>()
 }
 
 enum MessageEventType {

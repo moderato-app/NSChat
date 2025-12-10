@@ -32,24 +32,18 @@ struct ProviderConfigurationForm: View {
         if isPasswordVisible {
           TextField("", text: $provider.apiKey)
             .focused($isApiKeyFocused)
-            .onSubmit {
-              if mode == .Add {
-                em.apiKeySubmitted.send(provider.persistentModelID)
-              }
-            }
         } else {
           SecureField("", text: $provider.apiKey)
             .focused($isApiKeyFocused)
-            .onSubmit {
-              if mode == .Add {
-                em.apiKeySubmitted.send(provider.persistentModelID)
-              }
-            }
         }
       }
       .textContentType(.password)
       .submitLabel(.done)
       .onAppear { isApiKeyFocused = (mode == .Add) }
+      .onChange(of: isApiKeyFocused) { _, b in
+        guard mode == .Add, !b, provider.apiKey.isMeaningful else { return }
+        em.shouldFetchModels.send(provider.persistentModelID)
+      }
     } header: {
       HStack {
         Text("API Key")
