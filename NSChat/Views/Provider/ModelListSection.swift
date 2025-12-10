@@ -1,4 +1,5 @@
 import os
+import SwiftData
 import SwiftUI
 
 struct ModelListSection: View {
@@ -7,6 +8,7 @@ struct ModelListSection: View {
 
   @Binding var modelToEdit: ModelEntity?
   @Binding var showingAddModel: Bool
+  @Environment(\.modelContext) private var modelContext
   @EnvironmentObject var em: EM
   @State var fetchStatus: ProviderFetchStatus = .idle
 
@@ -65,7 +67,7 @@ struct ModelListSection: View {
         }
       }
     }
-    .onReceive(em.apiKeySubmitted) { providerId in
+    .onReceive(em.shouldFetchModels) { providerId in
       if providerId == provider.persistentModelID && !provider.apiKey.isEmpty {
         fetchModels()
       }
@@ -107,10 +109,11 @@ struct ModelListSection: View {
 
     Task {
       do {
-        let fetcher = provider.type.createFetcher()
-        let modelInfos = try await fetcher.fetchModels(
+        let service = ProviderModelFetchService(modelContext: modelContext)
+        let modelInfos = try await service.fetchModels(
+          providerType: provider.type,
           apiKey: apiKey,
-          endpoint: provider.endpoint
+          endpoint: provider.endpoint.isEmpty ? nil : provider.endpoint
         )
 
         await MainActor.run {
@@ -126,7 +129,7 @@ struct ModelListSection: View {
             .from(
               error: error,
               operation: "Fetch models",
-              component: "ProviderDetailView"
+              component: "ModelListSection"
             ))
         }
       }

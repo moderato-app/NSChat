@@ -39,7 +39,9 @@ struct ProviderView: View {
       )
     }
     .animation(.default, value: provider.models.map { $0.persistentModelID })
-    .searchable(text: $searchText, prompt: "Search models")
+    .if(mode == .Edit) {
+      $0.searchable(text: $searchText, prompt: "Search models")
+    }
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(title)
     .toolbar {
@@ -105,117 +107,22 @@ struct ProviderView: View {
       return
     }
     
-    // First, try to fetch models using the provider's own fetcher
-    var fetchedModels: [ModelInfo] = []
+    let service = ProviderModelFetchService(modelContext: modelContext)
+    let fetchedModels: [ModelInfo]
     
     do {
-      let fetcher = provider.type.createFetcher()
-      fetchedModels = try await fetcher.fetchModels(
+      fetchedModels = try await service.fetchModels(
+        providerType: provider.type,
         apiKey: provider.apiKey,
         endpoint: provider.endpoint.isEmpty ? nil : provider.endpoint
       )
-      AppLogger.data.info("Fetched \(fetchedModels.count) models from \(provider.displayName) API")
     } catch {
       AppLogger.logError(.from(
         error: error,
-        operation: "Fetch models from provider",
+        operation: "Fetch models for provider",
         component: "ProviderView"
       ))
-    }
-    
-    // If no models were fetched, try OpenRouter fallback
-    if fetchedModels.isEmpty, let prefix = provider.type.openRouterPrefix {
-      // First, try to get OpenRouter models from database
-      let descriptor = FetchDescriptor<OpenRouterModel>()
-      let dbModels = try? modelContext.fetch(descriptor)
-      
-      if let dbModels = dbModels, !dbModels.isEmpty {
-        // Convert database models to ModelInfo and filter by prefix
-        let allOpenRouterModels = dbModels.map { model in
-          ModelInfo(
-            id: model.modelId,
-            name: model.modelName,
-            inputContextLength: model.inputContextLength,
-            outputContextLength: model.outputContextLength
-          )
-        }
-        
-        let filteredModels = allOpenRouterModels
-          .filter { modelInfo in
-            modelInfo.id.hasPrefix("\(prefix)/")
-          }
-          .map { modelInfo in
-            // Remove prefix from model ID
-            let prefixWithSlash = "\(prefix)/"
-            let modelIdWithoutPrefix = modelInfo.id.hasPrefix(prefixWithSlash)
-              ? String(modelInfo.id.dropFirst(prefixWithSlash.count))
-              : modelInfo.id
-            return ModelInfo(
-              id: modelIdWithoutPrefix,
-              name: modelInfo.name,
-              inputContextLength: modelInfo.inputContextLength,
-              outputContextLength: modelInfo.outputContextLength
-            )
-          }
-        
-        if !filteredModels.isEmpty {
-          fetchedModels = filteredModels
-          AppLogger.data.info("Fetched \(filteredModels.count) models from database filtered by prefix '\(prefix)/'")
-        }
-      }
-      
-      // If database has no models, fetch from OpenRouter API
-      if fetchedModels.isEmpty {
-        var allOpenRouterModels: [ModelInfo] = []
-        
-        // Try with empty API key first (some endpoints allow public access)
-        do {
-          let openRouterFetcher = OpenRouterModelFetcher()
-          allOpenRouterModels = try await openRouterFetcher.fetchModels(
-            apiKey: "",
-            endpoint: nil
-          )
-          AppLogger.data.info("Fetched OpenRouter models with public access")
-        } catch {
-          // If that fails, try with provider's API key
-          do {
-            let openRouterFetcher = OpenRouterModelFetcher()
-            allOpenRouterModels = try await openRouterFetcher.fetchModels(
-              apiKey: provider.apiKey,
-              endpoint: nil
-            )
-            AppLogger.data.info("Fetched OpenRouter models with provider API key")
-          } catch {
-            AppLogger.logError(.from(
-              error: error,
-              operation: "Fetch models from OpenRouter",
-              component: "ProviderView"
-            ))
-          }
-        }
-        
-        // Filter by prefix and remove prefix from model ID
-        if !allOpenRouterModels.isEmpty {
-          let prefixWithSlash = "\(prefix)/"
-          let filteredModels = allOpenRouterModels
-            .filter { modelInfo in
-              modelInfo.id.hasPrefix(prefixWithSlash)
-            }
-            .map { modelInfo in
-              // Remove prefix from model ID
-              let modelIdWithoutPrefix = String(modelInfo.id.dropFirst(prefixWithSlash.count))
-              return ModelInfo(
-                id: modelIdWithoutPrefix,
-                name: modelInfo.name,
-                inputContextLength: modelInfo.inputContextLength,
-                outputContextLength: modelInfo.outputContextLength
-              )
-            }
-          
-          fetchedModels = filteredModels
-          AppLogger.data.info("Fetched \(filteredModels.count) models from OpenRouter API filtered by prefix '\(prefix)/'")
-        }
-      }
+      return
     }
     
     // Update provider's models if we fetched any
