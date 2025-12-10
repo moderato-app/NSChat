@@ -208,40 +208,35 @@ final class ChatDetailVC: UIViewController {
     toBottomButton.trailing(to: view, offset: -15)
 
     // Use keyboardLayoutGuide for proper keyboard handling (iOS 15+)
-    NSLayoutConstraint.activate([
-      // Blur effect fills the input container and extends to bottom of screen
-      blurEffectView.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
-      blurEffectView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
-      blurEffectView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor),
-      blurEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    // Blur effect fills the input container and extends to bottom of screen
+    blurEffectView.top(to: inputContainerView)
+    blurEffectView.leading(to: inputContainerView)
+    blurEffectView.trailing(to: inputContainerView)
+    blurEffectView.bottom(to: view)
 
-      // Top separator line
-      topSeparatorView.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
-      topSeparatorView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
-      topSeparatorView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor),
-      topSeparatorView.heightAnchor.constraint(equalToConstant: 1.0 / UIScreen.main.scale),
+    // Top separator line
+    topSeparatorView.edges(to: inputContainerView, excluding: .bottom)
+    topSeparatorView.height(1.0 / UIScreen.main.scale)
 
-      inputToolbar.topAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: 6),
-      inputToolbar.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 18),
-      inputToolbar.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -18),
-      inputToolbar.heightAnchor.constraint(equalToConstant: 32),
+    inputToolbar.top(to: inputContainerView, offset: 6)
+    inputToolbar.leading(to: inputContainerView, offset: 18)
+    inputToolbar.trailing(to: inputContainerView, offset: -18)
+    inputToolbar.height(32)
 
-      inputWrapperView.topAnchor.constraint(equalTo: inputToolbar.bottomAnchor, constant: 6),
-      inputWrapperView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 8),
-      inputWrapperView.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -8),
-      inputWrapperView.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -12),
+    inputWrapperView.topToBottom(of: inputToolbar, offset: 6)
+    inputWrapperView.leading(to: inputContainerView, offset: 8)
+    inputWrapperView.trailing(to: inputContainerView, offset: -8)
+    inputWrapperView.bottom(to: inputContainerView, offset: -12)
 
-      inputTextField.topAnchor.constraint(equalTo: inputWrapperView.topAnchor, constant: 8),
-      inputTextField.leadingAnchor.constraint(equalTo: inputWrapperView.leadingAnchor, constant: 12),
-      inputTextField.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: -4),
-      inputTextField.bottomAnchor.constraint(equalTo: inputWrapperView.bottomAnchor, constant: -8),
-      inputTextField.heightAnchor.constraint(greaterThanOrEqualToConstant: 24),
+    inputTextField.top(to: inputWrapperView, offset: 8)
+    inputTextField.leading(to: inputWrapperView, offset: 12)
+    inputTextField.trailingToLeading(of: sendButton, offset: -4)
+    inputTextField.bottom(to: inputWrapperView, offset: -8)
+    inputTextField.height(24, relation: .equalOrGreater)
 
-      sendButton.trailingAnchor.constraint(equalTo: inputWrapperView.trailingAnchor, constant: -4),
-      sendButton.centerYAnchor.constraint(equalTo: inputWrapperView.centerYAnchor),
-      sendButton.widthAnchor.constraint(equalToConstant: 32),
-      sendButton.heightAnchor.constraint(equalToConstant: 32),
-    ])
+    sendButton.trailing(to: inputWrapperView, offset: -4)
+    sendButton.centerY(to: inputWrapperView)
+    sendButton.size(.init(width: 32, height: 32))
 
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     tapGesture.cancelsTouchesInView = false
