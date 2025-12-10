@@ -16,6 +16,7 @@ struct InputToolbarView: View {
   @EnvironmentObject private var em: EM
 
   @State var showingClearButton = false
+  @State private var isModelSelectionPresented = false
 
   private var favoritedModels: [ModelEntity] {
     let filtered = cachedModels.filter { $0.favorited }
@@ -63,6 +64,14 @@ struct InputToolbarView: View {
         showingClearButton = !b.isEmpty
       }
     }
+    .sheet(isPresented: $isModelSelectionPresented) {
+      NavigationStack {
+        ModelSelectionView(chatOption: chatOption)
+          .onDisappear {
+            reloadData()
+          }
+      }
+    }
   }
 
   // MARK: - ViewBuilder
@@ -81,11 +90,10 @@ struct InputToolbarView: View {
   private func modelPickerContent() -> some View {
     Menu {
       Button {
-        // TODO: Navigate to settings
+        isModelSelectionPresented = true
       } label: {
         Label("More", systemImage: "ellipsis")
       }
-      .hidden()
 
       if !groupedProviders.isEmpty {
         Section("Providers") {
