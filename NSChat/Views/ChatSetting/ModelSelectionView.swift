@@ -79,7 +79,7 @@ struct ModelSelectionContent: View {
     guard !keywords.isEmpty else { return true }
 
     let lowercasedText = text.lowercased()
-    return keywords.contains { keyword in
+    return keywords.allSatisfy { keyword in
       lowercasedText.contains(keyword.lowercased())
     }
   }
