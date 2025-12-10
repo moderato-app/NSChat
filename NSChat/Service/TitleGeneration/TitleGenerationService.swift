@@ -8,11 +8,11 @@ final class TitleGenerationService {
   
   private init() {}
   
-  /// Generates a title for the chat if conditions are met
+  /// Generates a title for the chat if conditions are met (auto mode)
   /// - Parameters:
   ///   - chat: The chat to generate a title for
   ///   - modelContext: The SwiftData model context
-  func generateTitle(chat: Chat, modelContext: ModelContext) {
+  func generateTitleAuto(chat: Chat, modelContext: ModelContext) {
     // Check condition 1: User has enabled auto-generate title
     guard Pref.shared.autoGenerateTitle else {
       AppLogger.data.debug("[TitleGenerationService] Auto-generate title is disabled")
@@ -25,15 +25,47 @@ final class TitleGenerationService {
       return
     }
     
-    // Check condition 3: Selected model exists
-    guard let model = chat.option.model else {
-      AppLogger.data.debug("[TitleGenerationService] No model selected, cannot generate title")
+    // Check condition 3: This is one of the first 3 AI messages
+    guard chat.messages.count < 6 else {
+      AppLogger.data.debug("[TitleGenerationService] Chat has more than 5 messages, skipping title generation")
       return
     }
     
-    // Check condition 4: This is one of the first 3 AI messages
-    guard chat.messages.count < 6 else {
-      AppLogger.data.debug("[TitleGenerationService] Chat has more than 5 messages, skipping title generation")
+    // Call the core generation function
+    generateTitleCore(chat: chat, modelContext: modelContext)
+  }
+  
+  /// Manually generates a title for the chat (skips most checks)
+  /// - Parameters:
+  ///   - chat: The chat to generate a title for
+  ///   - modelContext: The SwiftData model context
+  ///   - onStart: Optional callback when generation starts
+  ///   - onComplete: Optional callback when generation completes (success or failure)
+  func generateTitleManually(
+    chat: Chat,
+    modelContext: ModelContext,
+    onStart: (() -> Void)? = nil,
+    onComplete: (() -> Void)? = nil
+  ) {
+    AppLogger.data.info("[TitleGenerationService] Manual title generation requested")
+    generateTitleCore(chat: chat, modelContext: modelContext, onStart: onStart, onComplete: onComplete)
+  }
+  
+  /// Core title generation logic (shared between auto and manual modes)
+  /// - Parameters:
+  ///   - chat: The chat to generate a title for
+  ///   - modelContext: The SwiftData model context
+  ///   - onStart: Optional callback when generation starts
+  ///   - onComplete: Optional callback when generation completes (success or failure)
+  private func generateTitleCore(
+    chat: Chat,
+    modelContext: ModelContext,
+    onStart: (() -> Void)? = nil,
+    onComplete: (() -> Void)? = nil
+  ) {
+    // Check condition: Selected model exists
+    guard let model = chat.option.model else {
+      AppLogger.data.debug("[TitleGenerationService] No model selected, cannot generate title")
       return
     }
     
@@ -56,13 +88,31 @@ final class TitleGenerationService {
     
     // Build prompt for title generation
     let conversationContext = messageSnippets.joined(separator: "\n")
-    let prompt = """
-    Based on the following conversation, generate a concise title that match the language of the following conversation (max 20 characters):
     
-    \(conversationContext)
-    
-    Reply with only the title, nothing else.
-    """
+    let prompt: String
+    if chat.name == ChatConstants.DEFAULT_CHAT_NAME {
+      // First time generation
+      prompt = """
+      Based on the following conversation, generate a concise title that match the language of the following conversation (max 20 characters):
+      
+      \(conversationContext)
+      
+      Reply with only the title, nothing else.
+      """
+    } else {
+      // Regenerate with different title
+      prompt = """
+      Current title: "\(chat.name)"
+      
+      Generate a different title that better reflects the conversation content:
+
+      Based on the following conversation, generate a concise title that match the language of the following conversation (max 20 characters).
+            
+      \(conversationContext)
+      
+      Reply with only the title, nothing else.
+      """
+    }
 
     AppLogger.data.debug("[TitleGenerationService] Prompt: \(prompt)")
         
@@ -94,6 +144,9 @@ final class TitleGenerationService {
       config: config,
       onStart: {
         AppLogger.data.debug("[TitleGenerationService] Title generation started")
+        Task { @MainActor in
+          onStart?()
+        }
       },
       onDelta: { _, _ in
       },
@@ -128,10 +181,15 @@ final class TitleGenerationService {
           } else {
             AppLogger.data.warning("[TitleGenerationService] Generated title is empty, keeping default name")
           }
+          
+          onComplete?()
         }
       },
       onError: { error in
-        AppLogger.error.error("[TitleGenerationService] Failed to generate title: \(error.localizedDescription)")
+        Task { @MainActor in
+          AppLogger.error.error("[TitleGenerationService] Failed to generate title: \(error.localizedDescription)")
+          onComplete?()
+        }
       }
     )
   }

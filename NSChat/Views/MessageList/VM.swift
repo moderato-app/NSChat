@@ -250,7 +250,7 @@ extension InputAreaView {
           em.messageEvent.send(.eof)
           
           // Trigger auto-generate title if conditions are met
-          TitleGenerationService.shared.generateTitle(chat: chat, modelContext: modelContext)
+          TitleGenerationService.shared.generateTitleAuto(chat: chat, modelContext: modelContext)
         }
       },
       onError: { error in
