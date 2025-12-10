@@ -9,7 +9,7 @@ struct `EmptyProviderCard`: View {
         .font(.system(size: 48))
         .foregroundStyle(.secondary)
 
-      Text("No AI Provider")
+      Text("No AI Providers")
         .font(.headline)
 
       Text("Add a provider to get started")

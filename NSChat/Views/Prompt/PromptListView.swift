@@ -59,7 +59,7 @@ private struct ListPromptNoQuery: View {
         Section {
           list(prompts: myPrompts)
         } header: {
-          Text(myPrompts.count > 5 ? "MY PROMPTS (\(myPrompts.count))" : "MY PROMPTS")
+          Text(myPrompts.count > 5 ? "My Prompts (\(myPrompts.count))" : "My Prompts")
             .foregroundStyle(.tint)
         }
       }
@@ -68,7 +68,7 @@ private struct ListPromptNoQuery: View {
         Section {
           list(prompts: presets)
         } header: {
-          Text(presets.count > 5 ? "PRESETS (\(presets.count))" : "PRESETS")
+          Text(presets.count > 5 ? "Presets (\(presets.count))" : "Presets")
             .foregroundStyle(.tint)
         }
       }
@@ -104,7 +104,7 @@ private struct ListPromptNoQuery: View {
         }
       }
     } message: {
-      Text("This prompt will be deleted.")
+      Text("This prompt will be permanently deleted.")
     }
     .onReceive(em.chatOptionPromptChangeEvent) { id in
       if let co = chatOption {

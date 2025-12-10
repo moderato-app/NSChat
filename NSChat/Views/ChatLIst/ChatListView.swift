@@ -114,7 +114,7 @@ struct ChatListView: View {
         }
       }
     } message: {
-      Text("This chat will be deleted.")
+      Text("This chat will be permanently deleted.")
     }
     .confirmationDialog(
       "Delete \(selectedChatIDs.count) Chats",
@@ -126,7 +126,7 @@ struct ChatListView: View {
         selectedChatIDs = .init()
       }
     } message: {
-      Text("\(selectedChatIDs.count) chats will be deleted.")
+      Text("\(selectedChatIDs.count) chat\(selectedChatIDs.count == 1 ? "" : "s") will be permanently deleted.")
     }
     .confirmationDialog(
       "Clear \(chatToClearMessages?.messages.count ?? 0) Messages",
@@ -142,7 +142,8 @@ struct ChatListView: View {
         }
       }
     } message: {
-      Text("\(chatToClearMessages?.messages.count ?? 0) messages will be removed from this chat.")
+      let count = chatToClearMessages?.messages.count ?? 0
+      Text("\(count) message\(count == 1 ? "" : "s") will be cleared from this chat.")
     }
     .toolbar {
       toolbarItems()

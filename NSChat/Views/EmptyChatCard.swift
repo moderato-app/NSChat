@@ -9,7 +9,7 @@ struct EmptyChatCard: View {
         .font(.system(size: 48))
         .foregroundStyle(.secondary)
 
-      Text("No Chat")
+      Text("No Chats")
         .font(.headline)
 
       Text("Create a chat to get started")

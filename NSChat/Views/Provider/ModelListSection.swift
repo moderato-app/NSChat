@@ -100,11 +100,11 @@ struct ModelListSection: View {
         EmptyView()
       case .fetching:
         ProgressView()
-        Text("Fetching models...")
+        Text("Fetching models…")
       case .success(let count):
         Image(systemName: "checkmark.circle.fill")
           .foregroundColor(.green)
-        Text("Fetched \(count) models")
+        Text("Fetched \(count) model\(count == 1 ? "" : "s")")
       case .error(let message):
         Image(systemName: "exclamationmark.triangle.fill")
           .foregroundColor(.orange)
@@ -280,7 +280,7 @@ struct ModelRow: View {
         }
       } label: {
         Label(
-          model.favorited ? "Unstar" : "Star",
+          model.favorited ? "Unfavorite" : "Favorite",
           systemImage: model.favorited ? "star.slash.fill" : "star.fill"
         )
       }

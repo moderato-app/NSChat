@@ -28,7 +28,7 @@ extension SettingView {
       Text("Appearance")
     } footer: {
       if pref.magicScrolling {
-        Text("Move messages to the background when it goes off-screen.")
+        Text("Move messages to the background when they scroll off-screen.")
       }
     }
     .textCase(.none)

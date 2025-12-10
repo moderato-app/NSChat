@@ -54,9 +54,9 @@ struct SettingView: View {
         }
       } message: {
         if providersToDelete.count == 1 {
-          Text("This provider will be deleted.")
+          Text("This provider will be permanently deleted.")
         } else {
-          Text("\(providersToDelete.count) providers will be deleted.")
+          Text("\(providersToDelete.count) providers will be permanently deleted.")
         }
       }
       .toolbar {
