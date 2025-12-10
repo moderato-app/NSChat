@@ -1,10 +1,10 @@
 import Combine
+import os
 import SwiftData
 import SwiftUI
 import Then
 import TinyConstraints
 import UIKit
-import os
 
 // MARK: - ChatDetailVC
 
@@ -244,7 +244,7 @@ final class ChatDetailVC: UIViewController {
     // Setup navigation bar with blur effect
     let appearance = UINavigationBarAppearance()
     appearance.configureWithDefaultBackground()
-    appearance.backgroundEffect = UIBlurEffect(style: .systemMaterial)
+    appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
     appearance.backgroundColor = .clear
 
     navigationController?.navigationBar.standardAppearance = appearance
@@ -291,9 +291,9 @@ final class ChatDetailVC: UIViewController {
     let cellRegistration = UICollectionView.CellRegistration<MessageCell, PersistentIdentifier> {
       [weak self] cell, _, messageID in
       guard let self = self,
-        let message = self.messages.first(where: { $0.id == messageID }),
-        let em = self.em,
-        let pref = self.pref
+            let message = self.messages.first(where: { $0.id == messageID }),
+            let em = self.em,
+            let pref = self.pref
       else { return }
 
       cell.configure(with: message, em: em, pref: pref) { [weak self] in
@@ -335,7 +335,7 @@ final class ChatDetailVC: UIViewController {
 
   func updateChat(_ chat: Chat) {
     self.chat = chat
-    reloadMessages(animated: false)
+    loadMessages(resetTotal: true, animated: false)
     scrollToBottom(animated: false)
     loadInputText()
     inputToolbar.reloadData()
