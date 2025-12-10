@@ -248,6 +248,9 @@ extension InputAreaView {
         Task { @MainActor in
           aiMsg.onEOF(text: "")
           em.messageEvent.send(.eof)
+          
+          // Trigger auto-generate title if conditions are met
+          TitleGenerationService.shared.generateTitle(chat: chat, modelContext: modelContext)
         }
       },
       onError: { error in

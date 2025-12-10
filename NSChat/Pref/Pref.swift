@@ -19,6 +19,7 @@ class Pref: ObservableObject {
   // Pref for new chat
   @AppStorage("newChatPref-historyMessageCount") var newChatPrefHistoryMessageCount: Int = 4
   @AppStorage("newChatPref-webSearchContextSize") var newChatPrefWebSearchContextSize: WebSearchContextSize = .low
+  @AppStorage("autoGenerateTitle") var autoGenerateTitle: Bool = true
 
   // Fill data record
   @AppStorage("fillDataRecordPrompts") var fillDataRecordPrompts: Bool = false
@@ -32,6 +33,7 @@ class Pref: ObservableObject {
     self.fillDataRecordPrompts = newPref.fillDataRecordPrompts
     self.newChatPrefHistoryMessageCount = newPref.newChatPrefHistoryMessageCount
     self.newChatPrefWebSearchContextSize = newPref.newChatPrefWebSearchContextSize
+    self.autoGenerateTitle = newPref.autoGenerateTitle
   }
 }
 
