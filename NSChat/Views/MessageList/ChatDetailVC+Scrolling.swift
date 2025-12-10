@@ -3,29 +3,31 @@ import UIKit
 // MARK: - Scrolling
 
 extension ChatDetailVC {
+  
+  /// Maximum content offset Y (scrolled to bottom position)
+  var maxContentOffsetY: CGFloat {
+    let contentHeight = collectionView.contentSize.height
+    let adjustedContentInset = collectionView.adjustedContentInset
+    let rawValue = contentHeight + adjustedContentInset.bottom - collectionView.bounds.height
+    // Handle case where there isn't enough content to fill the collection view
+    let minValue = -adjustedContentInset.top
+    return max(minValue, rawValue)
+  }
+  
+  /// Scrolls to the bottom of the message list
+  ///
+  /// Using UICollectionViewFlowLayout with sizeForItemAt delegate method,
+  /// cell heights are calculated before rendering, ensuring contentSize is accurate.
+  /// This allows for a single, smooth scroll operation (like Signal-iOS).
   func scrollToBottom(animated: Bool) {
     guard !messages.isEmpty else { return }
     
-    let lastIndex = IndexPath(item: messages.count - 1, section: 0)
+    // Ensure layout is up-to-date
+    collectionView.layoutIfNeeded()
     
-    // First scroll to last item to trigger cell loading
-    collectionView.scrollToItem(at: lastIndex, at: .bottom, animated: animated)
-    
-    // Then scroll visible rect to true bottom with accurate contentSize
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      
-      let contentHeight = self.collectionView.contentSize.height
-      let boundsHeight = self.collectionView.bounds.height
-      let contentInset = self.collectionView.adjustedContentInset
-      
-      let bottomOffset = contentHeight + contentInset.bottom - boundsHeight
-      
-      guard bottomOffset > -contentInset.top else { return }
-      
-      let targetOffset = CGPoint(x: 0, y: max(bottomOffset, -contentInset.top))
-      self.collectionView.setContentOffset(targetOffset, animated: animated)
-    }
+    // Calculate and scroll to the bottom in one step
+    let targetOffset = CGPoint(x: 0, y: maxContentOffsetY)
+    collectionView.setContentOffset(targetOffset, animated: animated)
   }
 
   @objc func scrollToBottomTapped() {
@@ -47,5 +49,14 @@ extension ChatDetailVC {
     if shouldShow != showToBottomButton {
       showToBottomButton = shouldShow
     }
+  }
+  
+  /// Check if scrolled to bottom
+  var isScrolledToBottom: Bool {
+    isScrolledToBottom(tolerancePoints: 5)
+  }
+  
+  func isScrolledToBottom(tolerancePoints: CGFloat) -> Bool {
+    maxContentOffsetY - collectionView.contentOffset.y <= tolerancePoints
   }
 }

@@ -18,6 +18,7 @@
 		EBB4EF292CDDC02200F38178 /* VisualEffectView in Frameworks */ = {isa = PBXBuildFile; productRef = EBB4EF282CDDC02200F38178 /* VisualEffectView */; };
 		EBCFF3952B6FF4CC00498E1E /* Throttler in Frameworks */ = {isa = PBXBuildFile; productRef = EBCFF3942B6FF4CC00498E1E /* Throttler */; };
 		EBD0114C2B98F2840046F235 /* Haptico in Frameworks */ = {isa = PBXBuildFile; productRef = EBD0114B2B98F2840046F235 /* Haptico */; };
+		EBFDA6D22EE96B48009933B0 /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = EBFDA6D12EE96B48009933B0 /* SwiftyMarkdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -72,6 +73,7 @@
 				EB5770DF2EE87D43001DC55C /* TinyConstraints in Frameworks */,
 				EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */,
 				EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */,
+				EBFDA6D22EE96B48009933B0 /* SwiftyMarkdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +123,7 @@
 				EB05DC9C2EE4BDC800D5654F /* SwiftQueue */,
 				EB5770DE2EE87D43001DC55C /* TinyConstraints */,
 				EB5770E12EE87D58001DC55C /* Then */,
+				EBFDA6D12EE96B48009933B0 /* SwiftyMarkdown */,
 			);
 			productName = NSChat;
 			productReference = EB1B51812EDB004800FD053A /* NSChat.app */;
@@ -162,6 +165,7 @@
 				EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */,
 				EB5770DD2EE87D43001DC55C /* XCRemoteSwiftPackageReference "TinyConstraints" */,
 				EB5770E02EE87D58001DC55C /* XCRemoteSwiftPackageReference "Then" */,
+				EBFDA6D02EE96B48009933B0 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 			);
 			productRefGroup = EB6422072B6F7BB000119DE6;
 			projectDirPath = "";
@@ -507,6 +511,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		EBFDA6D02EE96B48009933B0 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimonFairbairn/SwiftyMarkdown";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -563,6 +575,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EBD0114A2B98F2840046F235 /* XCRemoteSwiftPackageReference "Haptico" */;
 			productName = Haptico;
+		};
+		EBFDA6D12EE96B48009933B0 /* SwiftyMarkdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBFDA6D02EE96B48009933B0 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */;
+			productName = SwiftyMarkdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

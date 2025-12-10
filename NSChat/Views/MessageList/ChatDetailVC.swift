@@ -279,38 +279,26 @@ final class ChatDetailVC: UIViewController {
     inputToolbar.configure(modelContext: modelContext, em: em)
   }
 
-  private func createLayout() -> UICollectionViewCompositionalLayout {
-    let itemSize = NSCollectionLayoutSize(
-      widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(60)
-    )
-    let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-    let groupSize = NSCollectionLayoutSize(
-      widthDimension: .fractionalWidth(1.0),
-      heightDimension: .estimated(60)
-    )
-    let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
-    let section = NSCollectionLayoutSection(group: group)
-    section.interGroupSpacing = 17
-    section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 10, bottom: 20, trailing: 10)
-
-    return UICollectionViewCompositionalLayout(section: section)
+  private func createLayout() -> UICollectionViewFlowLayout {
+    // Using FlowLayout with sizeForItemAt delegate method to pre-calculate cell heights.
+    // This enables accurate contentSize calculation before cells are rendered,
+    // allowing single-step scrollToBottom (like Signal-iOS).
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .vertical
+    layout.minimumLineSpacing = MessageLayoutConstants.messageSpacing
+    layout.minimumInteritemSpacing = 0
+    return layout
   }
 
   private func setupDataSource() {
     let cellRegistration = UICollectionView.CellRegistration<MessageCell, PersistentIdentifier> {
       [weak self] cell, _, messageID in
       guard let self = self,
-            let message = self.messages.first(where: { $0.id == messageID }),
-            let em = self.em,
-            let pref = self.pref
+            let message = self.messages.first(where: { $0.id == messageID })
       else { return }
 
-      cell.configure(with: message, em: em, pref: pref) { [weak self] in
-        self?.onMsgCountChange()
-      }
+      cell.configure(with: message)
+      cell.delegate = self
     }
 
     dataSource = UICollectionViewDiffableDataSource<Section, PersistentIdentifier>(
