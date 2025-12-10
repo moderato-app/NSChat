@@ -44,7 +44,7 @@ final class ToBottomButton: UIButton {
     let isDarkMode = traitCollection.userInterfaceStyle == .dark
 
       if isDarkMode {
-        layer.shadowColor = UIColor.lightGray.cgColor
+        layer.shadowColor = UIColor.darkGray.cgColor
         setImage(darkImage, for: .normal)
       } else {
         layer.shadowColor = UIColor.black.cgColor

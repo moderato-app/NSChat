@@ -244,7 +244,6 @@ final class ChatDetailVC: UIViewController {
   }
 
   private func setupNavigationBar() {
-
     navigationItem.largeTitleDisplayMode = .never
 
     // Setup right bar button
@@ -295,7 +294,7 @@ final class ChatDetailVC: UIViewController {
 
     let section = NSCollectionLayoutSection(group: group)
     section.interGroupSpacing = 17
-    section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+    section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 10, bottom: 20, trailing: 10)
 
     return UICollectionViewCompositionalLayout(section: section)
   }
