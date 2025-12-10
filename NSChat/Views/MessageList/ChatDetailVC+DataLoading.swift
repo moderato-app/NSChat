@@ -6,6 +6,8 @@ import UIKit
 
 extension ChatDetailVC {
   func loadMessages(resetTotal: Bool = false, animated: Bool = false) {
+    AppLogger.ui.info("loadMessages(resetTotal: \(resetTotal), animated: \(animated))")
+
     if resetTotal {
       total = 10
     }
@@ -13,16 +15,13 @@ extension ChatDetailVC {
       .sorted { $0.createdAt > $1.createdAt }
       .prefix(total)
       .reversed()
-
-    applySnapshot(animated: animated)
-    updateSendMenuIfNeeded()
-  }
-
-  private func applySnapshot(animated: Bool) {
+   
     var snapshot = NSDiffableDataSourceSnapshot<ChatDetailVC.Section, PersistentIdentifier>()
     snapshot.appendSections([.main])
     snapshot.appendItems(messages.map { $0.id }, toSection: .main)
     dataSource.apply(snapshot, animatingDifferences: animated)
+
+    updateSendMenuIfNeeded()
   }
 
   func onMsgCountChange() {
