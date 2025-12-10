@@ -3,6 +3,7 @@ import os
 import SwiftData
 import SwiftUI
 import Then
+import Throttler
 import TinyConstraints
 import UIKit
 
@@ -347,29 +348,31 @@ final class ChatDetailVC: UIViewController {
   func updateStreamingMessage(_ messageId: PersistentIdentifier) {
     // Find the message
     guard let message = messages.first(where: { $0.id == messageId }) else { return }
-    
+
     // Find the index path
     guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
     let indexPath = IndexPath(item: index, section: 0)
-    
+
     // Check if user is near bottom before updating
-    let wasNearBottom = isScrolledToBottom(tolerancePoints: 100)
-    
+    let wasNearBottom = isScrolledToBottom(tolerancePoints: 15)
+
     // Update cell content if visible
     if let cell = collectionView.cellForItem(at: indexPath) as? MessageCell {
       cell.configure(with: message)
     }
-    
-    // Invalidate layout for this specific item to recalculate height
-    if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-      let context = UICollectionViewFlowLayoutInvalidationContext()
-      context.invalidateItems(at: [indexPath])
-      layout.invalidateLayout(with: context)
-      
-      // Force layout update to recalculate contentSize
+
+    throttle(
+      .seconds(0.1),
+      identifier: "ChatVC.updateStreamingMessageUI",
+      by: .mainActor,
+      option: .ensureLast
+    ) { [weak self] in
+      guard let self else { return }
+      AppLogger.ui.debug("🔄 bubbleSizeChanged, invalidateLayout")
+      let collectionViewLayout = self.collectionView.collectionViewLayout
+      collectionViewLayout.invalidateLayout()
       collectionView.layoutIfNeeded()
-      
-      // Auto-scroll to bottom if user was already there
+
       if wasNearBottom {
         let targetOffset = CGPoint(x: 0, y: maxContentOffsetY)
         collectionView.setContentOffset(targetOffset, animated: false)

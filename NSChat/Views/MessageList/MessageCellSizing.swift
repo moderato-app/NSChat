@@ -1,5 +1,4 @@
 import UIKit
-import SwiftyMarkdown
 
 // MARK: - MessageLayoutConstants
 
@@ -132,13 +131,8 @@ final class MessageCellSizing {
       )
     }
     
-    // Calculate text size based on role
-    let textSize: CGSize
-    if message.role == .assistant {
-      textSize = calculateMarkdownTextSize(message.message, maxWidth: textWidth)
-    } else {
-      textSize = calculatePlainTextSize(message.message, maxWidth: textWidth)
-    }
+    // Calculate text size (both roles use plain text now)
+    let textSize = calculatePlainTextSize(message.message, maxWidth: textWidth)
     
     // Add error info height if needed
     var totalHeight = textSize.height
@@ -158,17 +152,6 @@ final class MessageCellSizing {
     // Return final height with padding
     let finalHeight = totalHeight + MessageLayoutConstants.totalVerticalPadding
     return max(finalHeight, MessageLayoutConstants.minMessageHeight)
-  }
-  
-  /// Calculate size for markdown text using SwiftyMarkdown
-  private static func calculateMarkdownTextSize(_ text: String, maxWidth: CGFloat) -> CGSize {
-    guard !text.isEmpty else { return .zero }
-    
-    let md = SwiftyMarkdown(string: text)
-    configureMarkdownStyles(md)
-    
-    let attributedString = md.attributedString()
-    return calculateAttributedStringSize(attributedString, maxWidth: maxWidth)
   }
   
   /// Calculate size for plain text
@@ -202,50 +185,18 @@ final class MessageCellSizing {
     return CGSize(width: ceil(boundingRect.width), height: ceil(boundingRect.height))
   }
   
-  /// Configure SwiftyMarkdown styles to match the app theme
-  static func configureMarkdownStyles(_ md: SwiftyMarkdown) {
-    let bodyFont = UIFont.preferredFont(forTextStyle: .body)
-    let codeFont = UIFont.monospacedSystemFont(ofSize: bodyFont.pointSize * 0.9, weight: .regular)
-    
-    md.setFontColorForAllStyles(with: .label)
-    md.setFontSizeForAllStyles(with: bodyFont.pointSize)
-    
-    // Headers
-    md.h1.fontSize = bodyFont.pointSize * 1.5
-    md.h1.fontStyle = .bold
-    md.h2.fontSize = bodyFont.pointSize * 1.3
-    md.h2.fontStyle = .bold
-    md.h3.fontSize = bodyFont.pointSize * 1.15
-    md.h3.fontStyle = .bold
-    
-    // Code
-    md.code.fontName = codeFont.fontName
-    md.code.fontSize = codeFont.pointSize
-    md.code.color = .secondaryLabel
-    
-    // Links
-    md.link.color = .systemBlue
-    md.underlineLinks = true
-    
-    // Bold and italic
-    md.bold.fontStyle = .bold
-    md.italic.fontStyle = .italic
-    
-    // Blockquotes
-    md.blockquotes.color = .secondaryLabel
-    
-    // Strikethrough
-    md.strikethrough.color = .secondaryLabel
-  }
-  
   /// Create attributed string for a message
   static func attributedString(for message: Message) -> NSAttributedString {
+    let font = UIFont.preferredFont(forTextStyle: .body)
     if message.role == .assistant {
-      let md = SwiftyMarkdown(string: message.message)
-      configureMarkdownStyles(md)
-      return md.attributedString()
+      return NSAttributedString(
+        string: message.message,
+        attributes: [
+          .font: font,
+          .foregroundColor: UIColor.label
+        ]
+      )
     } else {
-      let font = UIFont.preferredFont(forTextStyle: .body)
       return NSAttributedString(
         string: message.message,
         attributes: [

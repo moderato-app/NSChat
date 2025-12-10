@@ -100,6 +100,7 @@ final class MessageCell: UICollectionViewCell {
     super.init(frame: frame)
     setupViews()
     setupConstraints()
+    setupTraitObservers()
   }
   
   @available(*, unavailable)
@@ -204,7 +205,6 @@ final class MessageCell: UICollectionViewCell {
     // Update content
     if message.role == .assistant {
       contentLabel.attributedText = MessageCellSizing.attributedString(for: message)
-      contentLabel.textColor = assistantTextColor
     } else {
       contentLabel.text = message.message
       contentLabel.textColor = .white
@@ -426,12 +426,13 @@ final class MessageCell: UICollectionViewCell {
     }
   }
   
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    if let message = message {
-      updateAppearance(for: message.role)
+  private func setupTraitObservers() {
+    registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (_: MessageCell, _) in
+      guard let self = self, let message = self.message else { return }
+      self.updateAppearance(for: message.role)
       if message.role == .assistant {
-        contentLabel.textColor = assistantTextColor
+        // Recreate attributed string to ensure color updates with theme change
+        self.contentLabel.attributedText = MessageCellSizing.attributedString(for: message)
       }
     }
   }
