@@ -4,8 +4,6 @@ import SwiftUI
 struct ChatOptionView: View {
   @Bindable private var chatOption: ChatOption
 
-  @Query private var allModels: [ModelEntity]
-
   init(_ chatOption: ChatOption) {
     self.chatOption = chatOption
   }
