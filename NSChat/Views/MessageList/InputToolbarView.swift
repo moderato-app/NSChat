@@ -163,7 +163,7 @@ struct InputToolbarView: View {
   @ViewBuilder
   private func historyPickerContent() -> some View {
     // History Messages Size Picker
-    Picker("History", selection: $chatOption.historyCount) {
+    Picker("History Messages", selection: $chatOption.historyCount) {
       Label("History Messages", systemImage: "clock.fill")
         .selectionDisabled()
 

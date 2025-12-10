@@ -19,7 +19,7 @@ final class MessageMeta {
   init(
     provider: String,
     model: String,
-          historyCount: Int,
+    historyCount: Int,
     actual_contextLength: Int,
     promptName: String?,
     temperature: Double,
@@ -32,7 +32,7 @@ final class MessageMeta {
   ) {
     self.provider = provider
     self.model = model
-    self.contextLength =       historyCount
+    self.contextLength = historyCount
     self.actual_contextLength = actual_contextLength
     self.promptName = promptName
     self.temperature = temperature
@@ -48,7 +48,7 @@ final class MessageMeta {
     return .init(
       provider: self.provider,
       model: self.model,
-            historyCount: self.contextLength,
+      historyCount: self.contextLength,
       actual_contextLength: self.actual_contextLength,
       promptName: self.promptName,
       temperature: self.temperature,
