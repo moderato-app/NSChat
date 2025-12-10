@@ -1,5 +1,5 @@
-import Foundation
 import AIProxy
+import Foundation
 import os
 
 /// Gemini streaming service
@@ -87,11 +87,23 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
             tools = nil
           }
           
+          // Build generation config with temperature and penalties
+          let generationConfig: GeminiGenerateContentRequestBody.GenerationConfig?
+          if config.temperature != nil || config.presencePenalty != nil || config.frequencyPenalty != nil {
+            generationConfig = GeminiGenerateContentRequestBody.GenerationConfig(
+              temperature: config.temperature,
+              presencePenalty: config.presencePenalty,
+              frequencyPenalty: config.frequencyPenalty
+            )
+          } else {
+            generationConfig = nil
+          }
+          
           // Build request body (conditionally enable Google Search)
           let requestBody = GeminiGenerateContentRequestBody(
             contents: contents,
             cachedContent: nil,
-            generationConfig: nil,
+            generationConfig: generationConfig,
             safetySettings: nil,
             systemInstruction: systemInstruction,
             toolConfig: nil,
@@ -119,8 +131,8 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
             // Extract text from candidates
             if let candidate = chunk.candidates?.first,
                let content = candidate.content,
-               let parts = content.parts {
-              
+               let parts = content.parts
+            {
               // Extract all text parts and combine them
               var chunkText = ""
               for part in parts {
@@ -182,8 +194,8 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
             // Check if completed (after processing text delta)
             if let candidate = chunk.candidates?.first,
                let finishReason = candidate.finishReason,
-               !finishReason.isEmpty {
-              
+               !finishReason.isEmpty
+            {
               AppLogger.network.info(
                 "[GeminiStreamingService] ✅ Streaming request completed - Reason: \(finishReason), Total length: \(accumulatedText.count)"
               )

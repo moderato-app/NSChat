@@ -203,7 +203,10 @@ extension InputAreaView {
         webSearch: .init(
           enabled: chat.option.webSearchOption?.enabled ?? false,
           contextSize: chat.option.webSearchOption?.contextSize ?? .low,
-        )
+        ),
+        temperature: chat.option.maybeTemperature,
+        presencePenalty: chat.option.maybePresencePenalty,
+        frequencyPenalty: chat.option.maybeFrequencyPenalty
       )
     }
     
