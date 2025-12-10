@@ -4,35 +4,7 @@ import SwiftData
 
 extension ModelContext {
   func createNewChat() throws -> Chat {
-    // Lastest chat
-    let predicate = #Predicate<Chat> { $0.option.model != nil }
-    let fetcher = FetchDescriptor<Chat>(
-      predicate: predicate,
-      sortBy: [SortDescriptor(\Chat.updatedAt, order: .reverse)],
-      fetchLimit: 1
-    )
-
-    var model: ModelEntity?
-
-    if let chat = try? fetch(fetcher).first {
-      // Find the latest chat with model
-      model = chat.option.model
-    }
-
-    if model == nil {
-      // Find the model with the most chats
-      let fetcher = FetchDescriptor<ChatOption>()
-      let opts = try? fetch(fetcher)
-
-      if let options = opts {
-        let models = options.compactMap { $0.model }
-        let grouped = Dictionary(grouping: models) { $0.persistentModelID }
-        if let mostUsed = grouped.max(by: { $0.value.count < $1.value.count }) {
-          model = mostUsed.value.first
-        }
-      }
-    }
-
+    let model = try chooseModel()
     let option = ChatOption(
       model: model,
       contextLength: Pref.shared.newChatPrefHistoryMessageCount,
@@ -41,6 +13,42 @@ extension ModelContext {
     let chat = Chat(name: "New Chat", option: option)
 
     return chat
+  }
+
+  func chooseModel() throws -> ModelEntity? {
+    var model: ModelEntity?
+
+    // Find model of the latest chat
+    let predicate = #Predicate<Chat> { $0.option.model != nil }
+    let fetcher = FetchDescriptor<Chat>(
+      predicate: predicate,
+      sortBy: [SortDescriptor(\Chat.updatedAt, order: .reverse)],
+      fetchLimit: 1
+    )
+    if let chat = try? fetch(fetcher).first {
+      // Find the latest chat with model
+      model = chat.option.model
+    }
+    if let model {
+      return model
+    }
+
+    // Find the model with the most chats
+    let fetcher2 = FetchDescriptor<ChatOption>()
+    let opts = try? fetch(fetcher2)
+    if let options = opts {
+      let models = options.compactMap { $0.model }
+      let grouped = Dictionary(grouping: models) { $0.persistentModelID }
+      if let mostUsed = grouped.max(by: { $0.value.count < $1.value.count }) {
+        model = mostUsed.value.first
+      }
+    }
+
+    let fetcher3 = FetchDescriptor<ModelEntity>()
+    if let allModels = try? fetch(fetcher3) {
+      model = ModelEntity.smartSort(allModels).first
+    }
+    return model
   }
 
   func getMessage(messageId: PersistentIdentifier) -> Message? {
