@@ -1,8 +1,8 @@
 import Combine
+import os
 import SwiftData
 import SwiftUI
 import SystemNotification
-import os
 
 struct InputToolbarView: View {
   @Bindable var chatOption: ChatOption
@@ -164,14 +164,11 @@ struct InputToolbarView: View {
   private func historyPickerContent() -> some View {
     // History Messages Size Picker
     Picker("History Messages", selection: $chatOption.historyCount) {
-      Label("History Messages", systemImage: "clock.fill")
-        .selectionDisabled()
-
-      Divider()
-
-      ForEach(historyCountChoices.reversed(), id: \.self) { choice in
-        Text(choice.lengthString)
-          .tag(choice.length)
+      Section("History Messages") {
+        ForEach(historyCountChoices.reversed(), id: \.self) { choice in
+          Text(choice.lengthString)
+            .tag(choice.length)
+        }
       }
     }
     .font(.caption)
