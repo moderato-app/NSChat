@@ -163,23 +163,23 @@ struct InputToolbarView: View {
   @ViewBuilder
   private func historyPickerContent() -> some View {
     // History Messages Size Picker
-    Picker("History", selection: $chatOption.contextLength) {
+    Picker("History", selection: $chatOption.historyCount) {
       Label("History Messages", systemImage: "clock.fill")
         .selectionDisabled()
 
       Divider()
 
-      ForEach(contextLengthChoices.reversed(), id: \.self) { choice in
+      ForEach(historyCountChoices.reversed(), id: \.self) { choice in
         Text(choice.lengthString)
           .tag(choice.length)
       }
     }
     .font(.caption)
     .controlSize(.small)
-    .if(chatOption.contextLength == ContextLength.zero.length) {
+    .if(chatOption.historyCount == HistoryCount.zero.length) {
       $0.tint(.secondary).foregroundStyle(.secondary)
     }
-    .if(chatOption.contextLength == ContextLength.infinite.length) {
+    .if(chatOption.historyCount == HistoryCount.infinite.length) {
       $0.tint(.orange)
     }
   }

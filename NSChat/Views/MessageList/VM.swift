@@ -78,7 +78,7 @@ extension InputAreaView {
     }
   }
   
-  func ask2(text: String, contextLength: Int, model: ModelEntity) {
+  func ask2(text: String, historyCount: Int, model: ModelEntity) {
     // Get provider from model
     let provider = model.provider
     
@@ -101,8 +101,8 @@ extension InputAreaView {
     
     // Add context messages (history)
     var actualCL = 0
-    if contextLength > 0 {
-      let hist = self.modelContext.recentMessgagesEarlyOnTop(chatId: chat.persistentModelID, limit: contextLength)
+    if historyCount > 0 {
+      let hist = self.modelContext.recentMessgagesEarlyOnTop(chatId: chat.persistentModelID, limit: historyCount)
       actualCL = hist.count
       
       for item in hist.sorted().reversed() {
@@ -143,7 +143,7 @@ extension InputAreaView {
     userMsg.meta = .init(
       provider: model.provider.displayName,
       model: model.modelId,
-      contextLength: contextLength,
+      historyCount: historyCount,
       actual_contextLength: actualCL,
       promptName: chat.option.prompt?.name,
       temperature: chat.option.temperature,
@@ -157,7 +157,7 @@ extension InputAreaView {
     aiMsg.meta = .init(
       provider: model.provider.displayName,
       model: model.modelId,
-      contextLength: contextLength,
+      historyCount: historyCount,
       actual_contextLength: actualCL,
       promptName: chat.option.prompt?.name,
       temperature: chat.option.temperature,

@@ -4,7 +4,7 @@ import SwiftData
 @Model
 final class ChatOption {
   @Attribute(originalName: "model") var oldModel: String = ""
-  @Attribute(originalName: "context_length") var contextLength: Int
+  @Attribute(originalName: "context_length") var historyCount: Int
   @Relationship(originalName: "prompt") var prompt: Prompt?
   // temperature  number or null  Optional  Defaults to 1
   // What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
@@ -24,14 +24,14 @@ final class ChatOption {
 
   init(model: ModelEntity? = nil, contextLength: Int = 2, prompt: Prompt? = nil, webSearchOption: WebSearch = WebSearch()) {
     self.model = model
-    self.contextLength = contextLength
+    self.historyCount = contextLength
     self.prompt = prompt
     self.webSearchOption = webSearchOption
   }
 
   init(model: ModelEntity? = nil, contextLength: Int, prompt: Prompt? = nil, temperature: Double, presencePenalty: Double, frequencyPenalty: Double, webSearchOption: WebSearch? = nil) {
     self.model = model
-    self.contextLength = contextLength
+    self.historyCount = contextLength
     self.prompt = prompt
     self.temperature = temperature
     self.presencePenalty = presencePenalty
@@ -57,7 +57,7 @@ final class ChatOption {
   func clone() -> ChatOption {
     return ChatOption(
       model: self.model,
-      contextLength: self.contextLength,
+      contextLength: self.historyCount,
       prompt: self.prompt,
       temperature: self.temperature,
       presencePenalty: self.presencePenalty,

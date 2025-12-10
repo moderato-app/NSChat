@@ -73,7 +73,7 @@ struct InputAreaView: View {
           .contentShape(Circle())
           .transition(.asymmetric(insertion: .scale, removal: .scale))
           .onTapGesture {
-            send(chat.option.contextLength)
+            send(chat.option.historyCount)
           }
           .contextMenu {
             let count = chat.messages.count
@@ -111,7 +111,7 @@ struct InputAreaView: View {
     .padding(EdgeInsets(top: 6, leading: 8, bottom: 12, trailing: 8))
   }
 
-  func send(_ contextLength: Int) {
+  func send(_ historyCount: Int) {
     guard let model = chat.option.model else {
       return
     }
@@ -122,7 +122,7 @@ struct InputAreaView: View {
     }
     isTextEditorFocused = false
     Task {
-      ask2(text: copy, contextLength: contextLength, model: model)
+      ask2(text: copy, historyCount: historyCount, model: model)
     }
   }
 }

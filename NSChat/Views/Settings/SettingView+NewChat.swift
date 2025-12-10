@@ -8,7 +8,7 @@ extension SettingView {
         Label("History Messages", systemImage: "clock")
         Spacer()
         Picker("History Messages", selection: $pref.newChatPrefHistoryMessageCount) {
-          ForEach(contextLengthChoices, id: \.self) { choice in
+          ForEach(historyCountChoices, id: \.self) { choice in
             Text(choice.lengthString)
               .tag(choice.length)
           }
