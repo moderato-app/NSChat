@@ -98,6 +98,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             input: input,
             model: modelID,
             stream: true,
+            temperature: config.temperature,
             tools: tools
           )
           

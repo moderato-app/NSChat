@@ -28,15 +28,35 @@ struct StreamingServiceConfig {
   
   /// Web search options
   let webSearch: WebSearchOptionConfig?
+  
+  /// Temperature parameter (0-2, higher = more random)
+  let temperature: Double?
+  
+  /// Presence penalty (-2.0 to 2.0, positive = penalize new tokens)
+  let presencePenalty: Double?
+  
+  /// Frequency penalty (-2.0 to 2.0, positive = penalize repetition)
+  let frequencyPenalty: Double?
    
-  /// Create config for OpenRouter
-  static func general(apiKey: String, modelID: String, endpoint: String?, webSearch: WebSearchOptionConfig?) -> StreamingServiceConfig {
+  /// Create config for general providers (OpenAI, OpenRouter, etc.)
+  static func general(
+    apiKey: String,
+    modelID: String,
+    endpoint: String?,
+    webSearch: WebSearchOptionConfig?,
+    temperature: Double? = nil,
+    presencePenalty: Double? = nil,
+    frequencyPenalty: Double? = nil
+  ) -> StreamingServiceConfig {
     return StreamingServiceConfig(
       apiKey: apiKey,
       modelID: modelID,
       endpoint: endpoint,
       wordCount: nil,
-      webSearch: webSearch
+      webSearch: webSearch,
+      temperature: temperature,
+      presencePenalty: presencePenalty,
+      frequencyPenalty: frequencyPenalty
     )
   }
   
@@ -47,7 +67,10 @@ struct StreamingServiceConfig {
       modelID: nil,
       endpoint: nil,
       wordCount: wordCount,
-      webSearch: nil
+      webSearch: nil,
+      temperature: nil,
+      presencePenalty: nil,
+      frequencyPenalty: nil
     )
   }
 }

@@ -1,5 +1,5 @@
-import Foundation
 import AIProxy
+import Foundation
 import os
 
 /// OpenRouter streaming service
@@ -70,8 +70,11 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
           // Build request body
           let requestBody = OpenRouterChatCompletionRequestBody(
             messages: requestMessages,
+            frequencyPenalty: config.frequencyPenalty,
             model: modelID,
-            stream: true
+            presencePenalty: config.presencePenalty,
+            stream: true,
+            temperature: config.temperature,
           )
           
           // Notify start
@@ -112,7 +115,7 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
             }
           }
           
-        } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
+        } catch let AIProxyError.unsuccessfulRequest(statusCode, responseBody) {
           let errorMessage = "OpenRouter API Error: \(statusCode) - \(responseBody)"
           AppLogger.error.error(
             "[OpenRouterStreamingService] ❌ API request failed: \(errorMessage)"
@@ -139,4 +142,3 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
     }
   }
 }
-
