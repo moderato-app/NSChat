@@ -68,6 +68,6 @@ extension ChatDetailVC {
 
     inputTextField.text = currentText
     updateSendButton()
-    inputToolbar.updateInputText(currentText)
+    inputToolbar.onTextChanged(isEmpty: currentText.isEmpty)
   }
 }

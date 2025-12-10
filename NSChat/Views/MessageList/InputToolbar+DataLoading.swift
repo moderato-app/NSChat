@@ -28,10 +28,15 @@ extension InputToolbar {
     updateWebSearchButton()
   }
 
-  func updateInputText(_ text: String) {
-    currentInputText = text
-    UIView.animate(withDuration: 0.2) {
-      self.clearButton.isHidden = text.isEmpty
+  func onTextChanged(isEmpty: Bool) {
+    if isEmpty, !self.clearButton.isHidden {
+      UIView.animate(withDuration: 0.2) {
+        self.clearButton.isHidden = true
+      }
+    } else if self.clearButton.isHidden {
+      UIView.animate(withDuration: 0.2) {
+        self.clearButton.isHidden = false
+      }
     }
   }
 

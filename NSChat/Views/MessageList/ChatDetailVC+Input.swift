@@ -7,7 +7,7 @@ extension ChatDetailVC {
   @objc func textFieldDidChange() {
     let text = inputTextField.text ?? ""
     updateSendButton()
-    inputToolbar.updateInputText(text)
+    inputToolbar.onTextChanged(isEmpty: text.isEmpty)
     inputTextDebounceSubject.send(text)
   }
 
@@ -42,7 +42,7 @@ extension ChatDetailVC {
 
     inputTextField.text = ""
     updateSendButton()
-    inputToolbar.updateInputText("")
+    inputToolbar.onTextChanged(isEmpty: true)
     inputTextField.resignFirstResponder()
 
     ChatSendService.shared.sendMessage(

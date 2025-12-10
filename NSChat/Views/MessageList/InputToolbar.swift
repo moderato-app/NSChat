@@ -20,7 +20,6 @@ final class InputToolbar: UIView {
   var cachedIsWebSearchAvailable = false
 
   var onInputTextChanged: ((String) -> Void)?
-  var currentInputText: String = ""
 
   // MARK: - UI Components
 

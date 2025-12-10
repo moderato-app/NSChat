@@ -15,7 +15,7 @@ extension ChatDetailVC {
       .sorted { $0.createdAt > $1.createdAt }
       .prefix(total)
       .reversed()
-   
+
     var snapshot = NSDiffableDataSourceSnapshot<ChatDetailVC.Section, PersistentIdentifier>()
     snapshot.appendSections([.main])
     snapshot.appendItems(messages.map { $0.id }, toSection: .main)
@@ -37,7 +37,7 @@ extension ChatDetailVC {
   func loadInputText() {
     inputTextField.text = chat.input
     updateSendButton()
-    inputToolbar.updateInputText(chat.input)
+    inputToolbar.onTextChanged(isEmpty: chat.input.isEmpty)
   }
 
   func saveInputText() {
