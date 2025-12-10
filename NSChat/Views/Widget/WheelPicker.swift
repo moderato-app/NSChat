@@ -14,7 +14,6 @@ struct WheelPicker: View {
 
   let start: Int
   let end: Int
-  let defaultValue: Int
   let spacing: CGFloat
   let haptic: Bool
 
@@ -37,7 +36,6 @@ struct WheelPicker: View {
     self._resetTrigger = resetTrigger
     self.start = start
     self.end = end
-    self.defaultValue = defaultValue
     self.spacing = spacing
     self.haptic = haptic
 

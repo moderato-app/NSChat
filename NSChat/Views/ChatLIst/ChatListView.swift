@@ -13,7 +13,6 @@ struct ChatListView: View {
 
   @Binding var navigationPath: NavigationPath
 
-  @State private var settingsDetent = PresentationDetent.medium
   @State private var isSettingPresented = false
   @State private var isAddProviderPresented = false
 

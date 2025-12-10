@@ -49,24 +49,5 @@ final class QueueService {
     
     AppLogger.data.info("[QueueService] Scheduled OpenRouter model fetch job (runs immediately on startup, then every 24 hours)")
   }
-  
-  func scheduleImmediateFetch() {
-    guard let manager = queueManager else {
-      AppLogger.error.error("[QueueService] QueueManager not initialized")
-      return
-    }
-    
-    // Cancel existing job
-    manager.cancelOperations(uuid: jobId)
-    
-    // Schedule immediate fetch
-    JobBuilder(type: jobType)
-      .singleInstance(forId: jobId, override: true)
-      .internet(atLeast: .cellular)
-      .retry(limit: .limited(10))
-      .schedule(manager: manager)
-    
-    AppLogger.data.info("[QueueService] Scheduled immediate OpenRouter model fetch")
-  }
 }
 

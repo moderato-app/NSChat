@@ -21,8 +21,4 @@ final class OpenRouterModel {
     self.outputContextLength = outputContextLength
     self.createdAt = .now
   }
-
-  var resolvedName: String {
-    modelName ?? modelId
-  }
 }
