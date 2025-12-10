@@ -102,12 +102,13 @@ final class TitleGenerationService {
     } else {
       // Regenerate with different title
       prompt = """
+
       Current title: "\(chat.name)"
       
-      Generate a different title that better reflects the conversation content:
+      Generate a different title that better reflects what the user want to discuss.
 
-      Based on the following conversation, generate a concise title that match the language of the following conversation (max 20 characters).
-            
+      Based on the following conversation, generate a concise title that match the language of the following conversation (max 40 characters).
+      
       \(conversationContext)
       
       Reply with only the title, nothing else.
@@ -158,8 +159,8 @@ final class TitleGenerationService {
             .replacingOccurrences(of: "\"", with: "")
             .replacingOccurrences(of: "'", with: "")
           
-          if cleanTitle.count > 20 {
-            cleanTitle = String(cleanTitle.prefix(20))
+          if cleanTitle.count > 100 {
+            cleanTitle = String(cleanTitle.prefix(100))
           }
           
           // Update chat name if we got a valid title
