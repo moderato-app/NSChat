@@ -1,3 +1,4 @@
+import os
 import SwiftData
 import SwiftUI
 
@@ -80,7 +81,16 @@ private struct ListProvider: View {
     ) {
       Button("Delete", role: .destructive) {
         for provider in providersToDelete {
-          modelContext.delete(provider)
+          do {
+            try modelContext.deleteProvider(provider)
+          } catch {
+            AppLogger.logError(
+              .from(
+                error: error,
+                operation: "Delete provider",
+                component: "ProviderListView"
+              ))
+          }
         }
         providersToDelete = []
       }

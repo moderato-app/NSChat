@@ -123,4 +123,43 @@ extension ModelContext {
   func removePresetPrompts() throws {
     try delete(model: Prompt.self, where: #Predicate<Prompt> { $0.preset })
   }
+
+  func deleteModel(_ model: ModelEntity) throws {
+    // Find all ChatOptions using this model
+    // Use the relationship from ModelEntity to find ChatOptions
+    let chatOptions = model.chatOptions
+    
+    // Set model to nil for all ChatOptions
+    for option in chatOptions {
+      option.model = nil
+    }
+    
+    // Remove model from provider's models array
+    model.provider.models.removeAll(where: { $0 == model })
+    
+    // Delete the model
+    delete(model)
+    
+    AppLogger.data.info("Deleted model: \(model.modelId), cleared \(chatOptions.count) chat options")
+  }
+
+  func deleteProvider(_ provider: Provider) throws {
+    // Find all models of this provider
+    let models = provider.models
+    var totalClearedOptions = 0
+    
+    // For each model, clear all ChatOptions that use it
+    for model in models {
+      let chatOptions = model.chatOptions
+      for option in chatOptions {
+        option.model = nil
+      }
+      totalClearedOptions += chatOptions.count
+    }
+    
+    // Delete the provider (this will cascade delete all models)
+    delete(provider)
+    
+    AppLogger.data.info("Deleted provider: \(provider.displayName), cleared \(totalClearedOptions) chat options from \(models.count) models")
+  }
 }

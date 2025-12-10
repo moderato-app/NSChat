@@ -155,7 +155,16 @@ struct ModelListSection: View {
   }
 
   func onDelete(model: ModelEntity) {
-    provider.models.removeAll(where: { model == $0 })
+    do {
+      try modelContext.deleteModel(model)
+    } catch {
+      AppLogger.logError(
+        .from(
+          error: error,
+          operation: "Delete model",
+          component: "ModelListSection"
+        ))
+    }
   }
 
   func updateModels(with modelInfos: [ModelInfo]) {

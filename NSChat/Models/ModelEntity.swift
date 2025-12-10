@@ -12,7 +12,7 @@ final class ModelEntity {
   @Attribute(originalName: "createdAt") var createdAt: Date
   @Relationship(originalName: "provider")
   var provider: Provider
-  @Relationship(deleteRule: .nullify, originalName: "chatOptions", inverse: \ChatOption.model)
+  @Relationship(deleteRule: .nullify, originalName: "chatOptions")
   var chatOptions: [ChatOption]
   @Relationship(deleteRule: .cascade, originalName: "usedModels", inverse: \UsedModel.model)
   var usedModels: [UsedModel]
