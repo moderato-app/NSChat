@@ -24,8 +24,7 @@ struct ChatDetailView: View {
       onPresentInfo: { isInfoPresented = true },
       onPresentPrompt: { isPromptPresented = true }
     )
-    .ignoresSafeArea(.keyboard)
-    .toolbarBackground(.hidden, for: .automatic)
+    .ignoresSafeArea(.all)
     .toolbar {
       ToolbarTitleMenu {
         Section {

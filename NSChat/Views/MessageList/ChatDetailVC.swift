@@ -170,6 +170,11 @@ final class ChatDetailVC: UIViewController {
     subscribeToEvents()
   }
 
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    configureNavigationBarAppearance()
+  }
+
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     scrollToBottom(animated: false)
@@ -239,18 +244,10 @@ final class ChatDetailVC: UIViewController {
   }
 
   private func setupNavigationBar() {
+
     navigationItem.largeTitleDisplayMode = .never
 
-    // Setup navigation bar with blur effect
-    let appearance = UINavigationBarAppearance()
-    appearance.configureWithDefaultBackground()
-    appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
-    appearance.backgroundColor = .clear
-
-    navigationController?.navigationBar.standardAppearance = appearance
-    navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    navigationController?.navigationBar.compactAppearance = appearance
-
+    // Setup right bar button
     let infoButton = UIBarButtonItem(
       image: UIImage(systemName: "ellipsis.circle"),
       style: .plain,
@@ -258,6 +255,22 @@ final class ChatDetailVC: UIViewController {
       action: #selector(infoTapped)
     )
     navigationItem.rightBarButtonItem = infoButton
+
+    guard let navigationBar = navigationController?.navigationBar else { return }
+    navigationBar.topItem?.setRightBarButtonItems([infoButton], animated: false)
+  }
+
+  private func configureNavigationBarAppearance() {
+    guard let navigationBar = navigationController?.navigationBar else { return }
+
+    // Setup navigation bar with blur effect
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithTransparentBackground()
+    appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.compactAppearance = appearance
   }
 
   func configure(em: EM, pref: Pref, modelContext: ModelContext) {

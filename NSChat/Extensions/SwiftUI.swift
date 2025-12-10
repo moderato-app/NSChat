@@ -6,7 +6,6 @@ import SwiftUI
 import Throttler
 import VisualEffectView
 
-
 struct SwitchableListRowInsets: ViewModifier {
   let apply: Bool
   let insets: EdgeInsets
@@ -46,7 +45,6 @@ func CondNavigationStack<Content: View>(_ condition: Bool, @ViewBuilder content:
   }
 }
 
-
 struct JustScrollView: ViewModifier {
   let id: PersistentIdentifier?
 
@@ -66,7 +64,6 @@ struct JustScrollView: ViewModifier {
     }
   }
 }
-
 
 extension Color {
   init(hex: String) {
@@ -112,21 +109,16 @@ public extension View {
   }
 }
 
-
-
-
 extension Spacer {
   static func widthPercent(_ percent: CGFloat) -> some View {
     return Spacer().containerRelativeFrame(.horizontal) { w, _ in w * percent }
   }
-
 }
 
 extension PresentationDetent {
   static let mediumDetents: Set<PresentationDetent> = Set([.medium])
   static let largeDetents: Set<PresentationDetent> = Set([.large])
 }
-
 
 struct TransNaviModifier: ViewModifier {
   @Environment(\.colorScheme) var colorScheme
@@ -137,7 +129,7 @@ struct TransNaviModifier: ViewModifier {
 
   func body(content: Content) -> some View {
     content
-      .toolbarBackground(.hidden, for: .navigationBar)
+      .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
       .safeAreaInset(edge: .top, spacing: 0) {
         VisualEffect(colorTint: visualTint, colorTintAlpha: 0.1, blurRadius: 18, scale: 1)
           .ignoresSafeArea(edges: .top)
@@ -151,4 +143,3 @@ public extension View {
     modifier(TransNaviModifier())
   }
 }
-
