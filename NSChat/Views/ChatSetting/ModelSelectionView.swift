@@ -4,7 +4,6 @@ import SwiftUI
 
 struct ModelSelectionView: View {
   @Environment(\.dismiss) private var dismiss
-  @Environment(\.colorScheme) private var colorScheme
 
   @Query(filter: #Predicate<Provider> { $0.enabled }) private var providers: [Provider]
 

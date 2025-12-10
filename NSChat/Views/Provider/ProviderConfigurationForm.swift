@@ -3,7 +3,6 @@ import SwiftUI
 struct ProviderConfigurationForm: View {
   @Bindable var provider: Provider
   let mode: ProviderViewMode
-  @EnvironmentObject var em: EM
 
   @State private var isPasswordVisible = false
   @FocusState private var isApiKeyFocused: Bool

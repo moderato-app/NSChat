@@ -10,6 +10,8 @@ final class OpenRouterModelFetchJob: Job {
   
   required init(params: [String: Any]?) {
     // ModelContainer will be provided by ModelContainerProvider singleton
+    // params parameter is required by Job protocol but not used
+    _ = params
     self.modelContainerProvider = ModelContainerProvider.shared
   }
   
