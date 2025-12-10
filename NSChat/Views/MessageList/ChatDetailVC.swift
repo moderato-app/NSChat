@@ -1,10 +1,10 @@
 import Combine
-import os
 import SwiftData
 import SwiftUI
 import Then
 import TinyConstraints
 import UIKit
+import os
 
 // MARK: - ChatDetailVC
 
@@ -121,7 +121,9 @@ final class ChatDetailVC: UIViewController {
   lazy var sendButton: UIButton = {
     var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: "arrow.up.circle.fill")
-    config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .bold)
+    config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
+      pointSize: 24, weight: .bold
+    )
     config.baseForegroundColor = .tintColor
 
     let button = UIButton(configuration: config)
@@ -196,22 +198,19 @@ final class ChatDetailVC: UIViewController {
     inputWrapperView.addSubview(sendButton)
 
     // Constraints
-    collectionView.edges(to: view,excluding: .bottom)
+    collectionView.edges(to: view, excluding: .bottom)
     collectionView.bottomToTop(of: inputContainerView)
-    
+
     inputContainerView.leading(to: view)
     inputContainerView.trailing(to: view)
     inputContainerView.bottom(to: view, view.keyboardLayoutGuide.topAnchor)
-    
+
     toBottomButton.size(.init(width: 40, height: 40))
     toBottomButton.bottomToTop(of: inputContainerView, offset: -15)
     toBottomButton.trailing(to: view, offset: -15)
 
-    // Use keyboardLayoutGuide for proper keyboard handling (iOS 15+)
     // Blur effect fills the input container and extends to bottom of screen
-    blurEffectView.top(to: inputContainerView)
-    blurEffectView.leading(to: inputContainerView)
-    blurEffectView.trailing(to: inputContainerView)
+    blurEffectView.edges(to: inputContainerView, excluding: .bottom)
     blurEffectView.bottom(to: view)
 
     // Top separator line
@@ -219,24 +218,20 @@ final class ChatDetailVC: UIViewController {
     topSeparatorView.height(1.0 / UIScreen.main.scale)
 
     inputToolbar.top(to: inputContainerView, offset: 6)
-    inputToolbar.leading(to: inputContainerView, offset: 18)
-    inputToolbar.trailing(to: inputContainerView, offset: -18)
+    inputToolbar.leading(to: inputContainerView, offset: 6)
+    inputToolbar.trailing(to: inputContainerView, offset: -6)
     inputToolbar.height(32)
 
     inputWrapperView.topToBottom(of: inputToolbar, offset: 6)
-    inputWrapperView.leading(to: inputContainerView, offset: 8)
-    inputWrapperView.trailing(to: inputContainerView, offset: -8)
-    inputWrapperView.bottom(to: inputContainerView, offset: -12)
+    inputWrapperView.edges(to: inputContainerView, excluding: .top, insets: .uniform(6))
 
-    inputTextField.top(to: inputWrapperView, offset: 8)
-    inputTextField.leading(to: inputWrapperView, offset: 12)
-    inputTextField.trailingToLeading(of: sendButton, offset: -4)
-    inputTextField.bottom(to: inputWrapperView, offset: -8)
     inputTextField.height(24, relation: .equalOrGreater)
+    inputTextField.edges(to: inputWrapperView, excluding: .trailing, insets: .uniform(6))
+    inputTextField.trailingToLeading(of: sendButton, offset: -4)
 
-    sendButton.trailing(to: inputWrapperView, offset: -4)
-    sendButton.centerY(to: inputWrapperView)
     sendButton.size(.init(width: 32, height: 32))
+    sendButton.centerX(to: inputWrapperView)
+    sendButton.trailing(to: inputWrapperView, offset: -4)
 
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     tapGesture.cancelsTouchesInView = false
@@ -293,11 +288,12 @@ final class ChatDetailVC: UIViewController {
   }
 
   private func setupDataSource() {
-    let cellRegistration = UICollectionView.CellRegistration<MessageCell, PersistentIdentifier> { [weak self] cell, _, messageID in
+    let cellRegistration = UICollectionView.CellRegistration<MessageCell, PersistentIdentifier> {
+      [weak self] cell, _, messageID in
       guard let self = self,
-            let message = self.messages.first(where: { $0.id == messageID }),
-            let em = self.em,
-            let pref = self.pref
+        let message = self.messages.first(where: { $0.id == messageID }),
+        let em = self.em,
+        let pref = self.pref
       else { return }
 
       cell.configure(with: message, em: em, pref: pref) { [weak self] in
@@ -305,9 +301,13 @@ final class ChatDetailVC: UIViewController {
       }
     }
 
-    dataSource = UICollectionViewDiffableDataSource<Section, PersistentIdentifier>(collectionView: collectionView) {
+    dataSource = UICollectionViewDiffableDataSource<Section, PersistentIdentifier>(
+      collectionView: collectionView
+    ) {
       collectionView, indexPath, identifier in
-      collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
+      collectionView.dequeueConfiguredReusableCell(
+        using: cellRegistration, for: indexPath, item: identifier
+      )
     }
   }
 
