@@ -1,6 +1,6 @@
 import Foundation
 
-enum ContextLength: Hashable {
+enum HistoryCount: Hashable {
   case zero
   case one
   case two
@@ -49,16 +49,16 @@ enum ContextLength: Hashable {
   }
 }
 
-let contextLengthChoices = [
-  ContextLength.zero,
-  ContextLength.one,
-  ContextLength.two,
-  ContextLength.three,
-  ContextLength.four,
-  ContextLength.six,
-  ContextLength.eight,
-  ContextLength.ten,
-  ContextLength.twenty,
-  ContextLength.infinite
+let historyCountChoices = [
+  HistoryCount.zero,
+  HistoryCount.one,
+  HistoryCount.two,
+  HistoryCount.three,
+  HistoryCount.four,
+  HistoryCount.six,
+  HistoryCount.eight,
+  HistoryCount.ten,
+  HistoryCount.twenty,
+  HistoryCount.infinite
 ]
 

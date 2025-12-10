@@ -86,7 +86,7 @@ struct NewChatView: View {
 
   func load() {
     chatOption.model = usedModels.first?.model
-    chatOption.contextLength = pref.newChatPrefHistoryMessageCount
+    chatOption.historyCount = pref.newChatPrefHistoryMessageCount
     chatOption.webSearchOption?.contextSize = pref.newChatPrefWebSearchContextSize
   }
 }

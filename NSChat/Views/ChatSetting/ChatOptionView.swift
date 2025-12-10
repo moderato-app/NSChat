@@ -42,14 +42,14 @@ struct ChatOptionView: View {
 
       VStack(alignment: .leading) {
         Label("History Messages", systemImage: "square.3.layers.3d.down.left")
-        Picker("History Messages", selection: $chatOption.contextLength) {
-          ForEach(contextLengthChoices, id: \.self) { c in
+        Picker("History Messages", selection: $chatOption.historyCount) {
+          ForEach(historyCountChoices, id: \.self) { c in
             Text("\(c.lengthString)")
               .tag(c.length)
           }
         }
         .pickerStyle(.segmented)
-        .selectionFeedback(chatOption.contextLength)
+        .selectionFeedback(chatOption.historyCount)
       }
     }
   }
