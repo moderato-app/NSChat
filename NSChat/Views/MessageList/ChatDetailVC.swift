@@ -2,9 +2,9 @@ import Combine
 import os
 import SwiftData
 import SwiftUI
-import UIKit
-import TinyConstraints
 import Then
+import TinyConstraints
+import UIKit
 
 // MARK: - ChatDetailVC
 
@@ -134,8 +134,6 @@ final class ChatDetailVC: UIViewController {
     return button
   }()
 
-  var toBottomButtonBottomConstraint: NSLayoutConstraint?
-
   // MARK: - Data Source
 
   var dataSource: UICollectionViewDiffableDataSource<Section, PersistentIdentifier>!
@@ -188,34 +186,29 @@ final class ChatDetailVC: UIViewController {
     view.addSubview(collectionView)
     view.addSubview(inputContainerView)
     view.addSubview(toBottomButton)
-    
+
     inputContainerView.addSubview(blurEffectView)
     inputContainerView.addSubview(topSeparatorView)
     inputContainerView.addSubview(inputToolbar)
     inputContainerView.addSubview(inputWrapperView)
-    
+
     inputWrapperView.addSubview(inputTextField)
     inputWrapperView.addSubview(sendButton)
+
+    // Constraints
+    collectionView.edges(to: view,excluding: .bottom)
+    collectionView.bottomToTop(of: inputContainerView)
     
-    toBottomButtonBottomConstraint = toBottomButton.bottomToTop(of: inputContainerView,offset: -15)
+    inputContainerView.leading(to: view)
+    inputContainerView.trailing(to: view)
+    inputContainerView.bottom(to: view, view.keyboardLayoutGuide.topAnchor)
+    
+    toBottomButton.size(.init(width: 40, height: 40))
+    toBottomButton.bottomToTop(of: inputContainerView, offset: -15)
+    toBottomButton.trailing(to: view, offset: -15)
 
     // Use keyboardLayoutGuide for proper keyboard handling (iOS 15+)
     NSLayoutConstraint.activate([
-      collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-      collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      collectionView.bottomAnchor.constraint(equalTo: inputContainerView.topAnchor),
-
-      toBottomButton.widthAnchor.constraint(equalToConstant: 40),
-      toBottomButton.heightAnchor.constraint(equalToConstant: 40),
-      toBottomButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
-      toBottomButtonBottomConstraint!,
-
-      // Input container uses keyboardLayoutGuide for keyboard-aware positioning
-      inputContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      inputContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      inputContainerView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
-
       // Blur effect fills the input container and extends to bottom of screen
       blurEffectView.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
       blurEffectView.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
@@ -333,7 +326,7 @@ final class ChatDetailVC: UIViewController {
   }
 
   private func setupTraitObservers() {
-    registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (viewController: Self, _) in
+    registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (_: Self, _) in
       self?.inputWrapperView.layer.borderColor = UIColor.separator.cgColor
     }
   }
