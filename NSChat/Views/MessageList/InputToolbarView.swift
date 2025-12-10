@@ -15,6 +15,8 @@ struct InputToolbarView: View {
   @EnvironmentObject private var notificationContext: SystemNotificationContext
   @EnvironmentObject private var em: EM
 
+  @State var showingClearButton = false
+
   private var favoritedModels: [ModelEntity] {
     let filtered = cachedModels.filter { $0.favorited }
     return ModelEntity.smartSort(filtered)
@@ -34,7 +36,7 @@ struct InputToolbarView: View {
   var body: some View {
     HStack(spacing: 8) {
       // Clear Button
-      if !inputText.isEmpty {
+      if showingClearButton {
         clearButtonContent()
           .transition(.asymmetric(insertion: .scale, removal: .scale).combined(with: .opacity))
       }
@@ -49,13 +51,17 @@ struct InputToolbarView: View {
 
       Spacer()
     }
-    .animation(.default, value: inputText.isEmpty)
     .animation(.default, value: chatOption.model)
     .task {
       reloadData()
     }
     .onReceive(em.chatOptionChanged) {
       reloadData()
+    }
+    .onChange(of: inputText) { _, b in
+      withAnimation {
+        showingClearButton = !b.isEmpty
+      }
     }
   }
 
@@ -64,9 +70,7 @@ struct InputToolbarView: View {
   @ViewBuilder
   private func clearButtonContent() -> some View {
     Button(action: {
-      withAnimation {
-        inputText = ""
-      }
+      inputText = ""
       HapticsService.shared.shake(.light)
     }) {
       ClearIcon(font: .body)
