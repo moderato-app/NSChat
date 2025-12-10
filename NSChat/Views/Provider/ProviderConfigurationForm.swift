@@ -10,10 +10,9 @@ struct ProviderConfigurationForm: View {
   var body: some View {
     Section {
       Picker("Provider", selection: $provider.type) {
-        ForEach(ProviderType.allCases, id: \.self) { type in
+        ForEach(ProviderType.allCases.filter(\.isSupportedByNSChat), id: \.self) { type in
           Text(type.displayName)
             .tag(type)
-            .selectionDisabled(!type.isSupportedByNSChat)
         }
       }
     } header: {
