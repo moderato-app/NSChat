@@ -1,8 +1,8 @@
 import Combine
-import os
 import SwiftData
 import SwiftUI
 import SystemNotification
+import os
 
 struct InputToolbarView: View {
   @Bindable var chatOption: ChatOption
@@ -84,27 +84,28 @@ struct InputToolbarView: View {
       .hidden()
 
       if !groupedProviders.isEmpty {
-        Divider()
-        Label("Providers", systemImage: "bolt.fill")
-        ForEach(groupedProviders, id: \.provider.id) { group in
-          providerMenu(group: group)
+        Section("Providers") {
+          ForEach(groupedProviders, id: \.provider.id) { group in
+            providerMenu(group: group)
+          }
         }
       }
 
       // Favorite models section - always first
       if !favoritedModels.isEmpty {
         Divider()
-        Label("Favorites", systemImage: "star.fill")
-        ForEach(favoritedModels) { model in
-          Button {
-            chatOption.model = model
-            em.chatOptionChanged.send()
-          } label: {
-            HStack {
-              Text(model.resolvedName)
-              Spacer()
-              if model.id == selectedModel?.id {
-                Image(systemName: "checkmark")
+        Section("Favorites") {
+          ForEach(favoritedModels) { model in
+            Button {
+              chatOption.model = model
+              em.chatOptionChanged.send()
+            } label: {
+              HStack {
+                Text(model.resolvedName)
+                Spacer()
+                if model.id == selectedModel?.id {
+                  Image(systemName: "checkmark")
+                }
               }
             }
           }
