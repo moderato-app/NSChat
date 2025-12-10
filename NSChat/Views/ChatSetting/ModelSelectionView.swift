@@ -7,7 +7,6 @@ struct ModelSelectionView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   @Query(filter: #Predicate<Provider> { $0.enabled }) private var providers: [Provider]
-  @Query private var allModels: [ModelEntity]
 
   @Bindable var chatOption: ChatOption
   @State private var searchText = ""
@@ -19,7 +18,7 @@ struct ModelSelectionView: View {
     ModelSelectionContent(
       chatOption: chatOption,
       providers: providers,
-      allModels: allModels,
+      allModels: providers.flatMap { $0.models },
       searchText: $searchText,
       expandedProviders: $expandedProviders,
       favoritesExpanded: $favoritesExpanded,
