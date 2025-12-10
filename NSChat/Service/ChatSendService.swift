@@ -21,7 +21,9 @@ final class ChatSendService {
     contextLength: Int,
     model: ModelEntity,
     modelContext: ModelContext,
-    em: EM
+    em: EM,
+    onStreamingMessageCreated: ((PersistentIdentifier) -> Void)? = nil,
+    onStreamingUpdate: ((PersistentIdentifier) -> Void)? = nil
   ) {
     let provider = model.provider
 
@@ -124,6 +126,15 @@ final class ChatSendService {
       return
     }
 
+    let aiMsgId = aiMsg.persistentModelID
+
+    // Notify streaming message created
+    Task.detached {
+      Task { @MainActor in
+        onStreamingMessageCreated?(aiMsgId)
+      }
+    }
+
     // Notify new message event
     Task.detached {
       Task { @MainActor in
@@ -184,6 +195,7 @@ final class ChatSendService {
             if let cache = self.deltaTextCache[sessionId] {
               self.deltaTextCache[sessionId] = ""
               aiMsg.onTyping(text: cache)
+              onStreamingUpdate?(aiMsgId)
             }
           }
         }
@@ -191,6 +203,7 @@ final class ChatSendService {
       onComplete: { _ in
         Task { @MainActor in
           aiMsg.onEOF(text: "")
+          onStreamingUpdate?(aiMsgId)
           em.messageEvent.send(.eof)
         }
       },
@@ -203,6 +216,7 @@ final class ChatSendService {
             aiMsg.onError(info, .unknown)
           }
           userMsg.onSent()
+          onStreamingUpdate?(aiMsgId)
           AppLogger.error.error("streaming error: \(error)")
           em.messageEvent.send(.err)
         }

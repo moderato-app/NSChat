@@ -51,7 +51,13 @@ extension ChatDetailVC {
       contextLength: contextLength,
       model: model,
       modelContext: modelContext,
-      em: em
+      em: em,
+      onStreamingMessageCreated: { [weak self] messageId in
+        self?.streamingMessageId = messageId
+      },
+      onStreamingUpdate: { [weak self] messageId in
+        self?.updateStreamingMessage(messageId)
+      }
     )
   }
 

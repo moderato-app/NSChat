@@ -32,17 +32,13 @@ extension ChatDetailVC {
     case .countChanged:
       onMsgCountChange()
     case .eof:
-      var snapshot = dataSource.snapshot()
-      snapshot.reconfigureItems(snapshot.itemIdentifiers)
-      dataSource.apply(snapshot, animatingDifferences: false)
+      streamingMessageId = nil
       Task {
         await sleepFor(0.2)
         HapticsService.shared.shake(.success)
       }
     case .err:
-      var snapshot = dataSource.snapshot()
-      snapshot.reconfigureItems(snapshot.itemIdentifiers)
-      dataSource.apply(snapshot, animatingDifferences: false)
+      streamingMessageId = nil
       Task {
         await sleepFor(0.2)
         HapticsService.shared.shake(.error)

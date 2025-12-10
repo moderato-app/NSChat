@@ -17,6 +17,7 @@ final class ChatDetailVC: UIViewController {
   var cancellables = Set<AnyCancellable>()
   var inputTextDebounceSubject = PassthroughSubject<String, Never>()
   var lastMessageCount = 0
+  var streamingMessageId: PersistentIdentifier?
 
   weak var em: EM?
   weak var pref: Pref?
@@ -339,5 +340,14 @@ final class ChatDetailVC: UIViewController {
     scrollToBottom(animated: false)
     loadInputText()
     inputToolbar.reloadData()
+  }
+
+  // MARK: - Streaming Update
+
+  func updateStreamingMessage(_ messageId: PersistentIdentifier) {
+    guard dataSource.snapshot().itemIdentifiers.contains(messageId) else { return }
+    var snapshot = dataSource.snapshot()
+    snapshot.reconfigureItems([messageId])
+    dataSource.apply(snapshot, animatingDifferences: false)
   }
 }
