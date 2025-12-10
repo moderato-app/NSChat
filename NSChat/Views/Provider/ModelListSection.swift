@@ -30,10 +30,28 @@ struct ModelListSection: View {
       }
 
       if filteredModels.isEmpty && searchText.isEmpty && fetchStatus == .idle {
-        ContentUnavailableView {
-          Label("No Models", systemImage: "cube.transparent")
-        } description: {
-          Text("Fetch models from the provider or add custom models")
+        VStack {
+          ContentUnavailableView {
+            Label("No Models", systemImage: "cube.transparent")
+          } description: {
+            if !provider.apiKey.isMeaningful {
+              Text("Fetch models from the provider or add custom models")
+            }
+          }
+          if provider.apiKey.isMeaningful {
+            Button {
+              fetchModels()
+            } label: {
+              HStack {
+                Image(systemName: "arrow.clockwise")
+                  .backgroundStyle(.foreground)
+                Text("Fetch Models")
+              }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(fetchStatus == .fetching)
+            .padding(.bottom, 10)
+          }
         }
       } else {
         ForEach(filteredModels) { model in
@@ -98,7 +116,7 @@ struct ModelListSection: View {
 
   func fetchModels() {
     guard fetchStatus != .fetching else { return }
-    
+
     let apiKey = provider.apiKey
     if apiKey.isEmpty {
       fetchStatus = .error("API Key is required")
