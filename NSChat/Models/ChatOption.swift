@@ -17,7 +17,7 @@ final class ChatOption {
 //  Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
   @Attribute(originalName: "frequency_penalty") var frequencyPenalty: Double = 0
   // An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
-  @Relationship(originalName: "modelEntity")
+  @Relationship(originalName: "modelEntity", inverse: \ModelEntity.chatOptions)
   var model: ModelEntity?
   @Relationship(deleteRule: .cascade, originalName: "webSearchOption")
   var webSearchOption: WebSearch?
