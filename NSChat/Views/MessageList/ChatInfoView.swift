@@ -10,15 +10,44 @@ struct ChatInfoView: View {
 
   @Bindable var chat: Chat
   @State private var chatNamePlaceHolder: String = ""
+  @State private var isGeneratingTitle = false
 
   var body: some View {
     // let _ = Self.printChagesWhenDebug()
     NavigationStack {
       Form {
-        Section("Chat Name") {
+        Section {
           TextField(chatNamePlaceHolder, text: $chat.name)
             .focused($isFocused)
-        }.textCase(.none)
+        } header: {
+          HStack {
+            Text("Chat Name")
+            Spacer()
+            if isGeneratingTitle {
+              ProgressView()
+                .scaleEffect(0.8)
+            } else {
+              Button {
+                isGeneratingTitle = true
+                TitleGenerationService.shared.generateTitleManually(
+                  chat: chat,
+                  modelContext: modelContext,
+                  onStart: {
+                    isGeneratingTitle = true
+                  },
+                  onComplete: {
+                    isGeneratingTitle = false
+                  }
+                )
+              } label: {
+                Image(systemName: "arrow.clockwise")
+              }
+              .font(.caption)
+              .disabled(chat.option.model == nil || chat.messages.isEmpty)
+            }
+          }
+        }
+        .textCase(.none)
 
         Section("General") {
           ChatOptionView(chat.option)
