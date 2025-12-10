@@ -69,7 +69,7 @@ struct NormalMsgView: View {
         HapticsService.shared.shake(.success)
       }
     } message: {
-      Text("This message will be deleted.")
+      Text("This message will be permanently deleted.")
     }
   }
 
@@ -152,9 +152,9 @@ struct NormalMsgView: View {
           $0.onTapGesture(count: 2) {
             switchAction(pref.doubleTapAction)
           }
-        }.if(pref.trippleTapAction != .none) {
+        }.if(pref.tripleTapAction != .none) {
           $0.onTapGesture(count: 3) {
-            switchAction(pref.trippleTapAction)
+            switchAction(pref.tripleTapAction)
           }
         }
     }

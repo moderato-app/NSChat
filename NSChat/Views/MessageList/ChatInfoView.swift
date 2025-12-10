@@ -96,7 +96,7 @@ struct ChatInfoView: View {
           clearMessages()
         }
       } message: {
-        Text("Clear all messages from this chat.")
+        Text("All messages in this chat will be cleared.")
       }
       .onAppear {
         self.chatNamePlaceHolder = chat.name

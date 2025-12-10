@@ -96,9 +96,9 @@ private struct ListProvider: View {
       }
     } message: {
       if providersToDelete.count == 1 {
-        Text("This provider will be deleted.")
+        Text("This provider will be permanently deleted.")
       } else {
-        Text("\(providersToDelete.count) providers will be deleted.")
+        Text("\(providersToDelete.count) providers will be permanently deleted.")
       }
     }
   }
@@ -119,7 +119,7 @@ struct ProviderRow: View {
           .font(.body)
           .foregroundColor(provider.enabled ? .primary : .secondary)
         
-        Text("\(provider.models.count) models")
+        Text("\(provider.models.count) model\(provider.models.count == 1 ? "" : "s")")
           .font(.caption)
           .foregroundColor(.secondary)
       }

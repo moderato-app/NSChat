@@ -40,7 +40,7 @@ extension SettingView {
     } header: {
       Text("New Chat")
     } footer: {
-      Text("Controls the default history and web search options for newly created chats.")
+      Text("Default preferences for newly created chats.")
     }
     .textCase(.none)
   }

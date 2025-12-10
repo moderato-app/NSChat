@@ -51,7 +51,7 @@ struct DangerZoneView: View {
       isPresented: $isDeleteAllPromptsPresented,
       titleVisibility: .visible
     ) {
-      Button("Delete All Prompts.", role: .destructive) {
+      Button("Delete All Prompts", role: .destructive) {
         modelContext.clearAll(Prompt.self)
       }
     }
@@ -60,7 +60,7 @@ struct DangerZoneView: View {
       isPresented: $isDeleteAllProvidersPresented,
       titleVisibility: .visible
     ) {
-      Button("Delete All Providers.", role: .destructive) {
+      Button("Delete All Providers", role: .destructive) {
         modelContext.clearAll(Provider.self)
         AppLogger.data.info("Deleted all providers")
       }
@@ -70,7 +70,7 @@ struct DangerZoneView: View {
       isPresented: $isDeleteAllModelsPresented,
       titleVisibility: .visible
     ) {
-      Button("Remove Everything.", role: .destructive) {
+      Button("Remove Everything", role: .destructive) {
         modelContext.clearAllModels()
         AppLogger.data.info("Deleted all SwiftData models")
       }

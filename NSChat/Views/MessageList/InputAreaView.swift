@@ -81,9 +81,9 @@ struct InputAreaView: View {
               if count >= 20 {
                 Menu {
                   if count >= 20 { Button("20") { send(20) }}
-                  if count < 50 { Button("\(count) (all messages)") { send(count) }}
+                  if count < 50 { Button("All \(count) messages") { send(count) }}
                   if count >= 50 { Button("50") { send(50) }}
-                  if count > 50 { Button("\(count) (all messages)") { send(count) }}
+                  if count > 50 { Button("All \(count) messages") { send(count) }}
                 } label: {
                   Button("More") {}
                 }
@@ -91,10 +91,10 @@ struct InputAreaView: View {
                   Button("\(i)") { send(i) }
                 }
               } else {
-                if count > 10 { Button("\(count) (all messages)") { send(count) }}
+                if count > 10 { Button("All \(count) messages") { send(count) }}
                 ForEach((0 ... 10).reversed(), id: \.self) { i in
                   if i < count { Button("\(i)") { send(i) }}
-                  if i == count { Button("\(i) (all messages)") { send(i) }}
+                  if i == count { Button("All \(count) messages") { send(i) }}
                 }
               }
             }

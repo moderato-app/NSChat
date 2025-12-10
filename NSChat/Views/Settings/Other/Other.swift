@@ -43,8 +43,8 @@ struct OtherViewGroup: View {
           safariAddr = testFlightHTTPS
         } label: {
           Label {
-            Text("Join our TestFlight")
-              .tint(.primary)
+            Text("Join TestFlight")
+            .tint(.primary)
           } icon: {
             Image(systemName: "fan")
           }
@@ -58,8 +58,8 @@ struct OtherViewGroup: View {
         
         ShareLink(item: URL(string: appHTTPS)!) {
           Label {
-            Text("Recommend Us")
-              .tint(.primary)
+            Text("Share App")
+            .tint(.primary)
           } icon: {
             Image(systemName: "heart")
               .foregroundStyle(.pink)

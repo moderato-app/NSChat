@@ -25,25 +25,25 @@ extension SettingView {
       }
       
       HStack {
-        Label("Tripple Tap", systemImage: "hand.tap")
+        Label("Triple Tap", systemImage: "hand.tap")
           .symbolRenderingMode(.multicolor)
         Spacer()
-        Picker("Tripple Tap", selection: $pref.trippleTapAction.animation()) {
+        Picker("Triple Tap", selection: $pref.tripleTapAction.animation()) {
           ForEach(DoubleTapAction.allCases, id: \.self) { c in
             Text("\(c.rawValue)")
           }
         }
         .labelsHidden()
-        .selectionFeedback(pref.trippleTapAction)
+        .selectionFeedback(pref.tripleTapAction)
       }
     } header: {
       Text("App")
     } footer: {
       if pref.doubleTapAction == .reuse {
-        Text("Double-tap a message to input it, and double-tap again to withdraw.")
+        Text("Double-tap a message to reuse it. Double-tap again to cancel reuse.")
       }
-      if pref.trippleTapAction == .reuse {
-        Text("Tripple-tap a message to input it, and tripple-tap again to withdraw.")
+      if pref.tripleTapAction == .reuse {
+        Text("Triple-tap a message to reuse it. Triple-tap again to cancel reuse.")
       }
     }
     .textCase(.none)
