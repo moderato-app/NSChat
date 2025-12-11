@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */ = {isa = PBXBuildFile; productRef = EB05DC9C2EE4BDC800D5654F /* SwiftQueue */; };
 		EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */ = {isa = PBXBuildFile; productRef = EB1B46DE2EDAF0AD00FD053A /* AIProxy */; };
+		EB1B83D82EEB439C008E69E8 /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = EB1B83D72EEB439C008E69E8 /* Gzip */; };
 		EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */ = {isa = PBXBuildFile; productRef = EB508AF92EE2187300D27F29 /* SystemNotification */; };
 		EB8FB4F32C3940D60041833B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = EB8FB4F22C3940D60041833B /* MarkdownUI */; };
 		EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = EB9E72032BCAB7DF00D5B110 /* ConfettiSwiftUI */; };
@@ -65,6 +66,7 @@
 				EB8FB4F32C3940D60041833B /* MarkdownUI in Frameworks */,
 				EBD0114C2B98F2840046F235 /* Haptico in Frameworks */,
 				EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */,
+				EB1B83D82EEB439C008E69E8 /* Gzip in Frameworks */,
 				EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */,
 				EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */,
 				EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */,
@@ -115,6 +117,7 @@
 				EB1B46DE2EDAF0AD00FD053A /* AIProxy */,
 				EB508AF92EE2187300D27F29 /* SystemNotification */,
 				EB05DC9C2EE4BDC800D5654F /* SwiftQueue */,
+				EB1B83D72EEB439C008E69E8 /* Gzip */,
 			);
 			productName = NSChat;
 			productReference = EB1B51812EDB004800FD053A /* NSChat.app */;
@@ -154,6 +157,7 @@
 				EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */,
 				EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */,
 				EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */,
+				EB1B83D62EEB439C008E69E8 /* XCRemoteSwiftPackageReference "GzipSwift" */,
 			);
 			productRefGroup = EB6422072B6F7BB000119DE6;
 			projectDirPath = "";
@@ -435,6 +439,14 @@
 				minimumVersion = 0.132.0;
 			};
 		};
+		EB1B83D62EEB439C008E69E8 /* XCRemoteSwiftPackageReference "GzipSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/1024jp/GzipSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.0;
+			};
+		};
 		EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/danielsaidi/SystemNotification";
@@ -495,6 +507,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EB1B46DD2EDAF0AD00FD053A /* XCRemoteSwiftPackageReference "AIProxySwift" */;
 			productName = AIProxy;
+		};
+		EB1B83D72EEB439C008E69E8 /* Gzip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB1B83D62EEB439C008E69E8 /* XCRemoteSwiftPackageReference "GzipSwift" */;
+			productName = Gzip;
 		};
 		EB508AF92EE2187300D27F29 /* SystemNotification */ = {
 			isa = XCSwiftPackageProductDependency;
