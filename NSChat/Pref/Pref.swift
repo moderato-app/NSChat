@@ -8,6 +8,7 @@ class Pref: ObservableObject {
   @AppStorage("doubleTapAction") var doubleTapAction: DoubleTapAction = .reuse
   @AppStorage("trippleTapAction") var tripleTapAction: DoubleTapAction = .showInfo
   @AppStorage("magicScrolling") var magicScrolling: Bool = true
+  @AppStorage("linkOpenMode") var linkOpenMode: LinkOpenMode = .inApp
 
   @AppStorage("colorScheme") var colorScheme: AppColorScheme = .system
 
@@ -29,6 +30,7 @@ class Pref: ObservableObject {
     self.haptics = newPref.haptics
     self.doubleTapAction = newPref.doubleTapAction
     self.magicScrolling = newPref.magicScrolling
+    self.linkOpenMode = newPref.linkOpenMode
     self.colorScheme = newPref.colorScheme
     self.fillDataRecordPrompts = newPref.fillDataRecordPrompts
     self.newChatPrefHistoryMessageCount = newPref.newChatPrefHistoryMessageCount
@@ -39,6 +41,11 @@ class Pref: ObservableObject {
 
 enum DoubleTapAction: String, CaseIterable, Codable {
   case none = "None", reuse = "Reuse", copy = "Copy", showInfo = "Show Info"
+}
+
+enum LinkOpenMode: String, CaseIterable, Codable {
+  case inApp = "In-App Browser"
+  case system = "System Browser"
 }
 
 extension Pref {
