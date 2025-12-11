@@ -1,40 +1,15 @@
+import os
 import SwiftData
 import SwiftUI
-import os
 
 struct ProviderListView: View {
-  @State var searchString = ""
-
-  var body: some View {
-    ListProvider(searchString: searchString)
-      .searchable(text: $searchString)
-      .animation(.easeInOut, value: searchString)
-  }
-}
-
-private struct ListProvider: View {
-  @Query(sort: \Provider.createdAt, order: .reverse) private var allProviders: [Provider]
+  @Query(sort: \Provider.createdAt, order: .reverse) private var providers: [Provider]
 
   @State private var isAddProviderPresented = false
   @State private var isDeleteProviderConfirmPresented: Bool = false
   @State private var providersToDelete: [Provider] = []
 
   @Environment(\.modelContext) private var modelContext
-
-  let searchString: String
-
-  init(searchString: String) {
-    self.searchString = searchString
-  }
-
-  private var providers: [Provider] {
-    if searchString.isEmpty {
-      return allProviders
-    }
-    return allProviders.filter { provider in
-      provider.displayName.localizedStandardContains(searchString)
-    }
-  }
 
   var body: some View {
     List {
