@@ -154,7 +154,6 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
                   userInfo: [NSLocalizedDescriptionKey: errorEvent.message]
                 ))
               }
-              break
             
             // Response failed - handle failed responses
             case .responseFailed(let failed):
@@ -169,7 +168,6 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
                   userInfo: [NSLocalizedDescriptionKey: "Response failed"]
                 ))
               }
-              break
             
             // Lifecycle events - log for debugging
             case .responseCreated(let created):
