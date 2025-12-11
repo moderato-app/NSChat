@@ -30,7 +30,7 @@ struct DebugZoneView: View {
             ))
           }
         }
-        Button("Remove Preset Prompts", systemImage: "trash", role: .destructive) {
+        Button("Remove Preset Prompts", systemImage: "trash") {
           do {
             try modelContext.removePresetPrompts()
             try modelContext.save()
