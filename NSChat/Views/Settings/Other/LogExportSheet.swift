@@ -1,7 +1,7 @@
-import os
 import SwiftUI
+import os
 
-fileprivate let maxLogEntriesToShow = 500
+private let maxLogEntriesToShow = 500
 
 enum LogTimeRange: String, CaseIterable, Identifiable {
   case none = "None"
@@ -12,9 +12,9 @@ enum LogTimeRange: String, CaseIterable, Identifiable {
   case sixHours = "6 hours"
   case twelveHours = "12 hours"
   case twentyFourHours = "24 hours"
-  
+
   var id: String { rawValue }
-  
+
   var timeInterval: TimeInterval? {
     switch self {
     case .none:
@@ -47,28 +47,31 @@ struct LogExportSheet: View {
   @State private var mailData: MailData?
   @State private var showError = false
   @State private var errorMessage = ""
-  
+
   var body: some View {
     NavigationView {
       List {
         Section {
-          VStack(alignment: .leading, spacing: 8) {
-            Text("Select the time range of logs to export")
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            
-            Text("Logs will be attached to an email sent to the developer")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-          }
-          .padding(.vertical, 4)
-          
+          Text("Select the time range of logs to be attached to the email")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+
+            .padding(.vertical, 4)
+
           Picker("Time Range", selection: $selectedRange) {
             ForEach(LogTimeRange.allCases) { range in
               Text(range.rawValue).tag(range)
             }
           }
           .pickerStyle(.menu)
+          
+          if selectedRange != .none {
+            Text(
+              "⚠️ Logs may contain sensitive information such as API requests, conversation content, and error details. Please review before sending."
+            )
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          }
         }
         .textCase(.none)
 
@@ -80,7 +83,7 @@ struct LogExportSheet: View {
             dismiss()
           }
         }
-        
+
         ToolbarItem(placement: .confirmationAction) {
           Button("Email") {
             exportAndSendEmail()
@@ -107,7 +110,7 @@ struct LogExportSheet: View {
       }
     }
   }
-  
+
   @ViewBuilder
   private var preview: some View {
     if isLoadingLogs {
@@ -128,7 +131,7 @@ struct LogExportSheet: View {
                 .font(.system(.caption2, design: .monospaced))
                 .textSelection(.enabled)
             }
-            
+
             if logs.count > maxLogEntriesToShow {
               Text("... and \(logs.count - maxLogEntriesToShow) more entries")
                 .font(.caption)
@@ -146,28 +149,28 @@ struct LogExportSheet: View {
       .textCase(.none)
     }
   }
-  
+
   private func loadLogs(for range: LogTimeRange) {
     guard let timeInterval = range.timeInterval else {
       logs = []
       return
     }
-    
+
     isLoadingLogs = true
     DispatchQueue.global(qos: .userInitiated).async {
       let since = Date().addingTimeInterval(-timeInterval)
       let loadedLogs = LogService.readLogs(since: since)
-      
+
       DispatchQueue.main.async {
         self.logs = loadedLogs
         self.isLoadingLogs = false
       }
     }
   }
-  
+
   private func exportAndSendEmail() {
     isExporting = true
-    
+
     // If no time range is selected, send email without attachment
     if selectedRange == .none {
       let deviceInfo = generateDeviceInfo()
@@ -182,7 +185,7 @@ struct LogExportSheet: View {
       showMailComposer = true
       return
     }
-    
+
     // Otherwise, export logs and attach to email
     DispatchQueue.global(qos: .userInitiated).async {
       let since: Date
@@ -192,12 +195,12 @@ struct LogExportSheet: View {
         // Fallback
         since = Date().addingTimeInterval(-24 * 60 * 60)
       }
-      
+
       if let fileURL = LogService.exportLogsAsFile(since: since) {
         let isGzipped = fileURL.pathExtension == "gz"
         let mimeType = isGzipped ? "application/gzip" : "text/plain"
         let deviceInfo = self.generateDeviceInfo()
-        
+
         DispatchQueue.main.async {
           self.isExporting = false
           self.mailData = MailData(
@@ -218,13 +221,13 @@ struct LogExportSheet: View {
       }
     }
   }
-  
+
   private func generateDeviceInfo() -> String {
     let device = UIDevice.current
     let systemVersion = device.systemVersion
     let deviceModel = device.model
     let deviceName = device.name
-    
+
     // Get more specific device model
     var systemInfo = utsname()
     uname(&systemInfo)
@@ -233,45 +236,46 @@ struct LogExportSheet: View {
         String(validatingUTF8: $0)
       }
     }
-    
+
     // Get app version
-    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    let appVersion =
+      Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
-    
+
     // Get screen info
     let screen = UIScreen.main
     let screenSize = screen.bounds.size
     let scale = screen.scale
-    
+
     var info = """
-    Please describe the issue here:
-    
-    
-    
-    ────────────────────────────────
-    Device Information:
-    ────────────────────────────────
-    Device Model: \(deviceModel)
-    Device Name: \(deviceName)
-    Model Code: \(modelCode ?? "Unknown")
-    System Version: iOS \(systemVersion)
-    
-    App Version: \(appVersion) (\(buildNumber))
-    
-    Screen Size: \(Int(screenSize.width))×\(Int(screenSize.height))
-    Screen Scale: \(scale)x
-    """
-    
+      Please describe the issue here:
+
+
+
+      ────────────────────────────────
+      Device Information:
+      ────────────────────────────────
+      Device Model: \(deviceModel)
+      Device Name: \(deviceName)
+      Model Code: \(modelCode ?? "Unknown")
+      System Version: iOS \(systemVersion)
+
+      App Version: \(appVersion) (\(buildNumber))
+
+      Screen Size: \(Int(screenSize.width))×\(Int(screenSize.height))
+      Screen Scale: \(scale)x
+      """
+
     // Only include log info if a time range is selected
     if selectedRange != .none {
       info += """
-      
-      
-      Time Range: \(selectedRange.rawValue)
-      Log Count: \(logs.count) entries
-      """
+
+
+        Time Range: \(selectedRange.rawValue)
+        Log Count: \(logs.count) entries
+        """
     }
-    
+
     return info
   }
 }
