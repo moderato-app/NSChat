@@ -15,7 +15,6 @@ struct NormalMsgView: View {
   @State private var translationVisible = false
   @State private var isInfoPresented = false
   @State private var softHaptics = false
-  @State private var safariURL: String?
 
   private let deleteCallback: () -> Void
   init(msg: Message, deleteCallback: @escaping () -> Void) {
@@ -72,10 +71,6 @@ struct NormalMsgView: View {
     } message: {
       Text("This message will be permanently deleted.")
     }
-    .sheet(item: $safariURL) { urlString in
-      SafariView(url: URL(string: urlString)!)
-        .presentationDetents([.large])
-    }
   }
 
   @ViewBuilder
@@ -90,14 +85,8 @@ struct NormalMsgView: View {
                 .markdownBlockStyle(\.codeBlock) {
                   codeBlock($0)
                 }
-                .environment(\.openURL, OpenURLAction { url in
-                  handleLinkClick(url: url)
-                })
             } else {
               Markdown(msg.message)
-                .environment(\.openURL, OpenURLAction { url in
-                  handleLinkClick(url: url)
-                })
             }
           } else {
             Text(msg.message)
@@ -205,16 +194,6 @@ struct NormalMsgView: View {
 
   private func removeMsg(msg: Message) {
     modelContext.delete(msg)
-  }
-
-  private func handleLinkClick(url: URL) -> OpenURLAction.Result {
-    switch pref.linkOpenMode {
-    case .inApp:
-      safariURL = url.absoluteString
-      return .handled
-    case .system:
-      return .systemAction
-    }
   }
 }
 

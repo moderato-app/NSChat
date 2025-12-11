@@ -39,6 +39,7 @@ struct ChatDetailView: View {
           .preferredColorScheme(colorScheme)
           .presentationDetents([.large])
       }
+      .browserLinkHandler()
   }
 }
 

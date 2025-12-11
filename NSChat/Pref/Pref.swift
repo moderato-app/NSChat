@@ -8,7 +8,7 @@ class Pref: ObservableObject {
   @AppStorage("doubleTapAction") var doubleTapAction: DoubleTapAction = .reuse
   @AppStorage("trippleTapAction") var tripleTapAction: DoubleTapAction = .showInfo
   @AppStorage("magicScrolling") var magicScrolling: Bool = true
-  @AppStorage("linkOpenMode") var linkOpenMode: LinkOpenMode = .inApp
+  @AppStorage("linkOpenMode") var linkOpenMode: LinkOpenMode = .inAppSheet
 
   @AppStorage("colorScheme") var colorScheme: AppColorScheme = .system
 
@@ -44,7 +44,8 @@ enum DoubleTapAction: String, CaseIterable, Codable {
 }
 
 enum LinkOpenMode: String, CaseIterable, Codable {
-  case inApp = "In-App Browser"
+  case inAppSheet = "In-App Browser(Sheet)"
+  case inAppFullScreen = "In-App Browser(Full Screen)"
   case system = "System Browser"
 }
 
