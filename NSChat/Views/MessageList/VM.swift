@@ -265,7 +265,7 @@ extension InputAreaView {
             (sessionId + "_max_count", .milliseconds(1000))
           }
           throttle(delay, identifier: identifier, option: .ensureLast) {
-            if let cache = deltaTextCache[sessionId] {
+            if let cache = deltaTextCache[sessionId], !cache.isEmpty {
               deltaTextCache[sessionId] = ""
               aiMsg.onTyping(text: cache)
             }
@@ -274,9 +274,14 @@ extension InputAreaView {
       },
       onComplete: { _ in
         Task { @MainActor in
+          if let cache = deltaTextCache[sessionId], !cache.isEmpty {
+            deltaTextCache[sessionId] = ""
+            aiMsg.onTyping(text: cache)
+          }
+
           aiMsg.onEOF(text: "")
           em.messageEvent.send(.eof)
-
+          
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
           AppLogger.data.debug("[VM] deltaTextCache cleared")
@@ -287,6 +292,11 @@ extension InputAreaView {
       },
       onError: { error in
         Task { @MainActor in
+          if let cache = deltaTextCache[sessionId], !cache.isEmpty {
+            deltaTextCache[sessionId] = ""
+            aiMsg.onTyping(text: cache)
+          }
+
           let info = "\(error)"
           if info.lowercased().contains("api key") || info.lowercased().contains("apikey") {
             aiMsg.onError(info, .apiKey)
