@@ -1,10 +1,10 @@
-import os
 import SwiftData
 import SwiftUI
+import os
 
 struct ProviderListView: View {
   @State var searchString = ""
-  
+
   var body: some View {
     ListProvider(searchString: searchString)
       .searchable(text: $searchString)
@@ -14,19 +14,19 @@ struct ProviderListView: View {
 
 private struct ListProvider: View {
   @Query(sort: \Provider.createdAt, order: .reverse) private var allProviders: [Provider]
-  
+
   @State private var isAddProviderPresented = false
   @State private var isDeleteProviderConfirmPresented: Bool = false
   @State private var providersToDelete: [Provider] = []
-  
+
   @Environment(\.modelContext) private var modelContext
-  
+
   let searchString: String
-  
+
   init(searchString: String) {
     self.searchString = searchString
   }
-  
+
   private var providers: [Provider] {
     if searchString.isEmpty {
       return allProviders
@@ -35,7 +35,7 @@ private struct ListProvider: View {
       provider.displayName.localizedStandardContains(searchString)
     }
   }
-  
+
   var body: some View {
     List {
       if providers.isEmpty {
@@ -55,7 +55,7 @@ private struct ListProvider: View {
           }
         }
         .onDelete(perform: deleteProviders)
-        
+
         Button {
           isAddProviderPresented = true
         } label: {
@@ -75,7 +75,9 @@ private struct ListProvider: View {
       ProviderView(provider: provider, mode: .Add)
     }
     .confirmationDialog(
-      providersToDelete.count == 1 ? (providersToDelete.first?.displayName ?? "Provider") : "Delete \(providersToDelete.count) Providers",
+      providersToDelete.count == 1
+        ? (providersToDelete.first?.displayName ?? "Provider")
+        : "Delete \(providersToDelete.count) Providers",
       isPresented: $isDeleteProviderConfirmPresented,
       titleVisibility: .visible
     ) {
@@ -83,6 +85,7 @@ private struct ListProvider: View {
         for provider in providersToDelete {
           do {
             try modelContext.deleteProvider(provider)
+            try modelContext.save()
           } catch {
             AppLogger.logError(
               .from(
@@ -102,7 +105,7 @@ private struct ListProvider: View {
       }
     }
   }
-  
+
   func deleteProviders(at offsets: IndexSet) {
     providersToDelete = offsets.map { providers[$0] }
     isDeleteProviderConfirmPresented = true
@@ -111,19 +114,19 @@ private struct ListProvider: View {
 
 struct ProviderRow: View {
   let provider: Provider
-  
+
   var body: some View {
     HStack {
       VStack(alignment: .leading, spacing: 4) {
         Text(provider.displayName)
           .font(.body)
           .foregroundColor(provider.enabled ? .primary : .secondary)
-        
+
         Text("\(provider.models.count) model\(provider.models.count == 1 ? "" : "s")")
           .font(.caption)
           .foregroundColor(.secondary)
       }
-      
+
       Spacer()
     }
   }
