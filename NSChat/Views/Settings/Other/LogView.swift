@@ -3,7 +3,8 @@ import os
 
 struct LogView: View {
   @State private var logs: [String] = []
-  @State private var isLoading = false
+  @State private var isLoadingLogs = false
+  @State private var isExporting = false
   @State private var exportURL: URL?
   @State private var showShareSheet = false
   @State private var showError = false
@@ -22,25 +23,29 @@ struct LogView: View {
             Image(systemName: "arrow.clockwise")
           }
         }
-        .disabled(isLoading)
+        .disabled(isLoadingLogs)
         
         Button {
           exportLogs()
         } label: {
           Label {
-            Text("Export Logs")
+            Text(isExporting ? "Exporting..." : "Export Logs")
               .tint(.primary)
           } icon: {
-            Image(systemName: "square.and.arrow.up")
+            if isExporting {
+              ProgressView()
+            } else {
+              Image(systemName: "square.and.arrow.up")
+            }
           }
         }
-        .disabled(isLoading || logs.isEmpty)
+        .disabled(isLoadingLogs || isExporting || logs.isEmpty)
       } header: {
         Text("Actions")
       }
       .textCase(.none)
       
-      if isLoading {
+      if isLoadingLogs {
         Section {
           HStack {
             Spacer()
@@ -92,28 +97,28 @@ struct LogView: View {
   }
   
   private func loadLogs() {
-    isLoading = true
+    isLoadingLogs = true
     DispatchQueue.global(qos: .userInitiated).async {
       let loadedLogs = LogService.readLogs()
       DispatchQueue.main.async {
         self.logs = loadedLogs
-        self.isLoading = false
+        self.isLoadingLogs = false
       }
     }
   }
   
   private func exportLogs() {
-    isLoading = true
+    isExporting = true
     DispatchQueue.global(qos: .userInitiated).async {
       if let url = LogService.exportLogs() {
         DispatchQueue.main.async {
           self.exportURL = url
-          self.isLoading = false
+          self.isExporting = false
           self.showShareSheet = true
         }
       } else {
         DispatchQueue.main.async {
-          self.isLoading = false
+          self.isExporting = false
           self.errorMessage = "Failed to export logs"
           self.showError = true
         }
