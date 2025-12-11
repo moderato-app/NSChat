@@ -1,5 +1,5 @@
-import Foundation
 import AIProxy
+import Foundation
 import os
 
 /// OpenAI streaming service
@@ -73,9 +73,9 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             case .user:
               return .message(role: .user, content: .text(message.content))
             case .assistant:
-              return .message(role: .assistant,content: .text(message.content))
+              return .message(role: .assistant, content: .text(message.content))
             case .system:
-              return .message(role: .system ,content: .text(message.content))
+              return .message(role: .system, content: .text(message.content))
             }
           }
           let input = OpenAIResponse.Input.items(inputItems)
@@ -108,8 +108,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           }
           
           // Initiate streaming request
-          let stream = try await openAIService.createStreamingResponse(requestBody: requestBody, secondsToWait: 60
-          )
+          let stream = try await openAIService.createStreamingResponse(requestBody: requestBody, secondsToWait: 60)
           
           var accumulatedText = ""
           var isCompleted = false
@@ -165,7 +164,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
                 onError(NSError(
                   domain: "OpenAIStreamingService",
                   code: -1,
-                  userInfo: [NSLocalizedDescriptionKey: "Response failed"]
+                  userInfo: [NSLocalizedDescriptionKey: "Response failed: \(failed.response.error.debugDescription)"]
                 ))
               }
             
@@ -340,4 +339,3 @@ private func mapSearchContextSize(_ size: WebSearchContextSize) -> OpenAICreateR
     return .low
   }
 }
-
