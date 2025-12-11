@@ -36,6 +36,19 @@ extension SettingView {
         .labelsHidden()
         .selectionFeedback(pref.tripleTapAction)
       }
+      
+      HStack {
+        Label("Link Opening", systemImage: "link")
+          .symbolRenderingMode(.multicolor)
+        Spacer()
+        Picker("Link Opening", selection: $pref.linkOpenMode.animation()) {
+          ForEach(LinkOpenMode.allCases, id: \.self) { mode in
+            Text(mode.rawValue)
+          }
+        }
+        .labelsHidden()
+        .selectionFeedback(pref.linkOpenMode)
+      }
     } header: {
       Text("App")
     } footer: {
