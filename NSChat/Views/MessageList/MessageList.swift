@@ -97,7 +97,9 @@ struct MessageList: View {
       .scrollTargetLayout()
     }
     .background(Rectangle().fill(.gray.opacity(0.0001)).containerRelativeFrame(.horizontal) { v, _ in v })
-    .defaultScrollAnchor(.bottom)
+    .defaultScrollAnchor(.bottom, for: .initialOffset)
+    .defaultScrollAnchor(.bottom, for: .sizeChanges)
+    .defaultScrollAnchor(.top, for: .alignment)
     .scrollPosition($position, anchor: .bottom)
     .scrollDismissesKeyboard(.interactively)
     .removeFocusOnTap()
