@@ -13,6 +13,7 @@ struct SettingView: View {
   @Environment(\.openURL) var openURL
   @State var safariAddr: String? = nil
   @State var showViewLogs = false
+  @State var showLogExportSheet = false
 
   var body: some View {
     NavigationView {

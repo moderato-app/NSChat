@@ -11,13 +11,10 @@ extension SettingView {
         .textSelection(.enabled)
     ) {
       Button {
-        let email = email
-        if let emailURL = URL(string: "mailto:\(email)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!) {
-          openURL(emailURL)
-        }
+        showLogExportSheet = true
       } label: {
         Label {
-          Text("Contact Us")
+          Text("Contact Support")
             .tint(.primary)
         } icon: {
           Image(systemName: "envelope")
@@ -34,6 +31,10 @@ extension SettingView {
             Text(showViewLogs ? "Hide" : "Show")
           }
         }
+        .tint(.indigo)
+      }
+      .sheet(isPresented: $showLogExportSheet) {
+        LogExportSheet()
       }
 
       if showViewLogs {

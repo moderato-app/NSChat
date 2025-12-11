@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 import os
+import Gzip
 
 /// Service for reading and exporting OSLog logs
 final class LogService {
@@ -61,6 +62,58 @@ final class LogService {
       return fileURL
     } catch {
       return nil
+    }
+  }
+  
+  /// Export logs as file (compressed if > 1MB)
+  /// - Parameter since: Start date for log entries
+  /// - Returns: URL of the exported file (txt or txt.gz), or nil if export failed
+  @available(iOS 15.0, *)
+  static func exportLogsAsFile(since: Date = Date().addingTimeInterval(-24 * 60 * 60)) -> URL? {
+    let logs = readLogs(since: since)
+    
+    guard !logs.isEmpty else {
+      return nil
+    }
+    
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss Z"
+    let dateString = dateFormatter.string(from: Date())
+    
+    let logContent = logs.joined(separator: "\n")
+    
+    guard let inputData = logContent.data(using: .utf8) else {
+      return nil
+    }
+    
+    let tmpDir = FileManager.default.temporaryDirectory
+    let oneMB = 1024 * 1024
+    
+    // If less than 1MB, export as plain text
+    if inputData.count < oneMB {
+      let txtFileName = "nschat_logs_\(dateString).txt"
+      let txtFileURL = tmpDir.appendingPathComponent(txtFileName)
+      
+      do {
+        try inputData.write(to: txtFileURL, options: .atomic)
+        return txtFileURL
+      } catch {
+        return nil
+      }
+    } else {
+      // Compress using GzipSwift if >= 1MB
+      do {
+        let compressedData = try inputData.gzipped()
+        
+        let gzipFileName = "nschat_logs_\(dateString).txt.gz"
+        let gzipFileURL = tmpDir.appendingPathComponent(gzipFileName)
+        
+        try compressedData.write(to: gzipFileURL, options: .atomic)
+        
+        return gzipFileURL
+      } catch {
+        return nil
+      }
     }
   }
   
