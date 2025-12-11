@@ -10,7 +10,10 @@ struct SettingView: View {
   @Environment(\.colorScheme) var colorScheme
   @Environment(\.modelContext) var modelContext
   @EnvironmentObject var storeVM: StoreVM
-   
+  @Environment(\.openURL) var openURL
+  @State var safariAddr: String? = nil
+  @State var showViewLogs = false
+
   var body: some View {
     NavigationView {
       List {
@@ -20,7 +23,9 @@ struct SettingView: View {
         
         newChatPreferenceSection
         
-        OtherViewGroup()
+        supportSection
+        
+        aboutSection
         
         dangerZoneLink
         

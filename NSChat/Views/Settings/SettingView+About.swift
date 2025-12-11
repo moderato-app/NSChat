@@ -1,10 +1,9 @@
 import SwiftUI
 
-let privacyHTTPS = "https://nschat.moderato.app/privacy"
-let termsHTTPS = "https://nschat.moderato.app/terms"
-let testFlightHTTPS = "https://testflight.apple.com/join/axaO3S26"
-let appHTTPS = "https://apps.apple.com/us/app/chato/id6478404197"
-let email = "support@moderato.app"
+private let privacyHTTPS = "https://nschat.moderato.app/privacy"
+private let termsHTTPS = "https://nschat.moderato.app/terms"
+private let testFlightHTTPS = "https://testflight.apple.com/join/axaO3S26"
+private let appHTTPS = "https://apps.apple.com/us/app/chato/id6478404197"
 
 extension SettingView {
   @ViewBuilder
