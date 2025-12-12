@@ -52,7 +52,7 @@ struct LogExportSheet: View {
     NavigationView {
       List {
         Section {
-          Text("Select the time range of logs to be attached to the email")
+          Text("Select time range for logs")
             .font(.subheadline)
             .foregroundStyle(.secondary)
 
@@ -79,13 +79,13 @@ struct LogExportSheet: View {
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
+          Button("Back") {
             dismiss()
           }
         }
 
         ToolbarItem(placement: .confirmationAction) {
-          Button("Email") {
+          Button("Next") {
             exportAndSendEmail()
           }
           .disabled(isExporting || isLoadingLogs)
