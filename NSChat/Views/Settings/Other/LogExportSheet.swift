@@ -79,7 +79,7 @@ struct LogExportSheet: View {
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Back") {
+          Button("Cancel") {
             dismiss()
           }
         }
