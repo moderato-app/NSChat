@@ -17,6 +17,7 @@
 		EBB4EF292CDDC02200F38178 /* VisualEffectView in Frameworks */ = {isa = PBXBuildFile; productRef = EBB4EF282CDDC02200F38178 /* VisualEffectView */; };
 		EBCFF3952B6FF4CC00498E1E /* Throttler in Frameworks */ = {isa = PBXBuildFile; productRef = EBCFF3942B6FF4CC00498E1E /* Throttler */; };
 		EBD0114C2B98F2840046F235 /* Haptico in Frameworks */ = {isa = PBXBuildFile; productRef = EBD0114B2B98F2840046F235 /* Haptico */; };
+		EBF85FA62EEDD3B200D8788D /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = EBF85FA52EEDD3B200D8788D /* SwiftyBeaver */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,6 +68,7 @@
 				EBD0114C2B98F2840046F235 /* Haptico in Frameworks */,
 				EB1B46DF2EDAF0AD00FD053A /* AIProxy in Frameworks */,
 				EB1B83D82EEB439C008E69E8 /* Gzip in Frameworks */,
+				EBF85FA62EEDD3B200D8788D /* SwiftyBeaver in Frameworks */,
 				EB508AFA2EE2187300D27F29 /* SystemNotification in Frameworks */,
 				EB9E72042BCAB7DF00D5B110 /* ConfettiSwiftUI in Frameworks */,
 				EB05DC9D2EE4BDC800D5654F /* SwiftQueue in Frameworks */,
@@ -118,6 +120,7 @@
 				EB508AF92EE2187300D27F29 /* SystemNotification */,
 				EB05DC9C2EE4BDC800D5654F /* SwiftQueue */,
 				EB1B83D72EEB439C008E69E8 /* Gzip */,
+				EBF85FA52EEDD3B200D8788D /* SwiftyBeaver */,
 			);
 			productName = NSChat;
 			productReference = EB1B51812EDB004800FD053A /* NSChat.app */;
@@ -158,6 +161,7 @@
 				EB508AF82EE2187300D27F29 /* XCRemoteSwiftPackageReference "SystemNotification" */,
 				EB05DC9B2EE4BDC800D5654F /* XCRemoteSwiftPackageReference "SwiftQueue" */,
 				EB1B83D62EEB439C008E69E8 /* XCRemoteSwiftPackageReference "GzipSwift" */,
+				EBF85FA42EEDD3B200D8788D /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 			);
 			productRefGroup = EB6422072B6F7BB000119DE6;
 			projectDirPath = "";
@@ -495,6 +499,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		EBF85FA42EEDD3B200D8788D /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -546,6 +558,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EBD0114A2B98F2840046F235 /* XCRemoteSwiftPackageReference "Haptico" */;
 			productName = Haptico;
+		};
+		EBF85FA52EEDD3B200D8788D /* SwiftyBeaver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBF85FA42EEDD3B200D8788D /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
+			productName = SwiftyBeaver;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
