@@ -138,7 +138,7 @@ extension InputAreaView {
       case .assistant: roleStr = "assistant"
       case .system: roleStr = "system"
       }
-      AppLogger.network.debug("\(i).\(roleStr): \(m.content)")
+      AppLogger.network.debug("\(i).\(roleStr): \(m.content, privacy: .private)")
     }
     AppLogger.network.debug("===whole message list ends===")
 
@@ -281,10 +281,10 @@ extension InputAreaView {
 
           aiMsg.onEOF(text: "")
           em.messageEvent.send(.eof)
-          
+
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
-          AppLogger.data.debug("[VM] deltaTextCache cleared")
+          AppLogger.data.debug("deltaTextCache cleared")
 
           // Trigger auto-generate title if conditions are met
           TitleGenerationService.shared.generateTitleAuto(chat: chat, modelContext: modelContext)
@@ -309,7 +309,7 @@ extension InputAreaView {
 
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
-          AppLogger.data.debug("[VM] deltaTextCache cleared")
+          AppLogger.data.debug("deltaTextCache cleared")
         }
       }
     )

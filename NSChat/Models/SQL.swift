@@ -8,7 +8,10 @@ extension ModelContext {
     let option = ChatOption(
       model: model,
       contextLength: Pref.shared.newChatPrefHistoryMessageCount,
-      webSearchOption: WebSearch(contextSize: Pref.shared.newChatPrefWebSearchContextSize)
+      webSearchOption: WebSearch(
+        enabled: Pref.shared.newChatPrefWebSearchEnabled,
+        contextSize: Pref.shared.newChatPrefWebSearchContextSize
+      )
     )
     let chat = Chat(name: ChatConstants.DEFAULT_CHAT_NAME, option: option)
 

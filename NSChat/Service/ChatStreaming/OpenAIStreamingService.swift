@@ -28,7 +28,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
         // Validate required config parameters
         guard let apiKey = config.apiKey, let modelID = config.modelID else {
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ Config error: missing apiKey or modelID"
+            "❌ Config error: missing apiKey or modelID"
           )
           DispatchQueue.main.async {
             onError(NSError(
@@ -42,7 +42,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
         
         do {
           AppLogger.network.info(
-            "[OpenAIStreamingService] 🚀 Starting streaming request - Model: \(modelID)"
+            "🚀 Starting streaming request - Model: \(modelID)"
           )
           
           // Create OpenAI service (BYOK mode)
@@ -50,6 +50,10 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           if let endpoint = config.endpoint, !endpoint.isEmpty {
             do {
               let res = try parseURL(endpoint)
+              // Log endpoint base URL for diagnosis (without query params)
+              AppLogger.network.debug(
+                "Using custom endpoint: \(res.base, privacy: .sensitive)"
+              )
               openAIService = AIProxy.openAIDirectService(
                 unprotectedAPIKey: apiKey,
                 baseURL: res.base
@@ -102,6 +106,16 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             tools: tools
           )
           
+          // Log request configuration for diagnosis
+          AppLogger.network.debug(
+            "Request config",
+            context: [
+              "messages": messages.count,
+              "temperature": config.temperature?.description ?? "nil",
+              "tools": tools != nil ? "enabled" : "disabled"
+            ]
+          )
+          
           // Notify start
           DispatchQueue.main.async {
             onStart()
@@ -126,13 +140,22 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
               }
               
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 📝 Text delta received - Length: \(textDelta.delta.count): \(textDelta.delta)"
+                "📝 Text delta received",
+                context: [
+                  "Length": textDelta.delta.count,
+                  "Value": "\(textDelta.delta, privacy: .private)"
+                ]
               )
             
             // Response completed - marks successful completion
             case .responseCompleted(let completed):
               AppLogger.network.info(
-                "[OpenAIStreamingService] ✅ Response completed - ID: \(completed.response.id ?? "unknown"), Total length: \(accumulatedText.count)"
+                "✅ Response completed",
+                context: [
+                  "ID": "\(completed.response.id ?? "unknown", privacy: .sensitive)",
+                  "Total length": accumulatedText.count,
+                  "Content": "\(accumulatedText, privacy: .private)"
+                ]
               )
               
               isCompleted = true
@@ -143,7 +166,11 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Error event - handle API errors
             case .error(let errorEvent):
               AppLogger.error.error(
-                "[OpenAIStreamingService] ❌ Error event - Code: \(errorEvent.code), Message: \(errorEvent.message)"
+                "❌ Error event",
+                context: [
+                  "Code": errorEvent.code,
+                  "Message": "\(errorEvent.message, privacy: .public)"
+                ]
               )
               
               DispatchQueue.main.async {
@@ -157,9 +184,13 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Response failed - handle failed responses
             case .responseFailed(let failed):
               AppLogger.error.error(
-                "[OpenAIStreamingService] ❌ Response failed - ID: \(failed.response.id ?? "unknown")"
+                "❌ Response failed",
+                context: [
+                  "ID": "\(failed.response.id ?? "unknown", privacy: .sensitive)",
+                  "Error description": "\(String(describing: failed.response.error), privacy: .public)"
+                ]
               )
-              
+                            
               DispatchQueue.main.async {
                 onError(NSError(
                   domain: "OpenAIStreamingService",
@@ -171,130 +202,143 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Lifecycle events - log for debugging
             case .responseCreated(let created):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🎬 Response created - ID: \(created.response.id ?? "unknown")"
+                "🎬 Response created",
+                context: [
+                  "ID": "\(created.response.id ?? "unknown", privacy: .sensitive)",
+                  "Sequence number": created.sequenceNumber ?? -1
+                ]
               )
               
             case .responseInProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🔄 Response in progress")
+              AppLogger.network.debug("🔄 Response in progress")
               
             case .responseIncomplete:
-              AppLogger.network.warning("[OpenAIStreamingService] ⚠️ Response incomplete")
+              AppLogger.network.warning("⚠️ Response incomplete")
             
             // Web search events - log search activity
             case .webSearchCallInProgress:
-              AppLogger.network.info("[OpenAIStreamingService] 🔍 Web search in progress")
+              AppLogger.network.info("🔍 Web search in progress")
               
             case .webSearchCallSearching:
-              AppLogger.network.info("[OpenAIStreamingService] 🔍 Web search searching")
+              AppLogger.network.info("🔍 Web search searching")
               
             case .webSearchCallCompleted:
-              AppLogger.network.info("[OpenAIStreamingService] ✅ Web search completed")
+              AppLogger.network.info("✅ Web search completed")
             
             // Output item events - track output structure
             case .outputItemAdded(let item):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ➕ Output item added - Index: \(item.index ?? -1)"
+                "➕ Output item added - Index: \(item.index ?? -1)"
               )
               
             case .outputItemDone(let item):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Output item done - Index: \(item.outputIndex ?? -1)"
+                "✓ Output item done - Index: \(item.outputIndex ?? -1)"
               )
             
             // Content part events - track content structure
             case .contentPartAdded(let part):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ➕ Content part added - Index: \(part.contentIndex ?? -1)"
+                "➕ Content part added - Index: \(part.contentIndex ?? -1)"
               )
               
             case .contentPartDone(let part):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Content part done - Index: \(part.contentIndex ?? -1)"
+                "✓ Content part done - Index: \(part.contentIndex ?? -1)"
               )
             
             // Text completion - marks end of text
             case .outputTextDone(let textDone):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Text done - Length: \(textDone.text.count)"
+                "✓ Text done - Length: \(textDone.text.count)"
               )
             
             // Refusal events - log when model refuses
             case .refusalDelta(let refusal):
-              AppLogger.network.warning(
-                "[OpenAIStreamingService] 🚫 Refusal delta: \(refusal.delta)"
-              )
+              AppLogger.network.warning("🚫 Refusal delta", context: [
+                "count": refusal.delta.count,
+                "value": "\(refusal.delta, privacy: .private)"
+              ])
               
             case .refusalDone(let refusal):
               AppLogger.network.warning(
-                "[OpenAIStreamingService] 🚫 Refusal: \(refusal.refusal)"
+                "🚫 Refusal done",
+                context: [
+                  "Length": refusal.refusal.count,
+                  "Content": "\(refusal.refusal, privacy: .private)"
+                ]
               )
             
             // Function call events - log function calling activity
             case .functionCallArgumentsDelta(let args):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🔧 Function args delta - Length: \(args.delta.count)"
+                "🔧 Function args delta - Length: \(args.delta.count)"
               )
               
             case .functionCallArgumentsDone(let args):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Function args done - Length: \(args.arguments.count)"
+                "✓ Function args done - Length: \(args.arguments.count)"
               )
             
             // File search events - log file search activity
             case .fileSearchCallInProgress:
-              AppLogger.network.info("[OpenAIStreamingService] 📁 File search in progress")
+              AppLogger.network.info("📁 File search in progress")
               
             case .fileSearchCallSearching:
-              AppLogger.network.info("[OpenAIStreamingService] 📁 File search searching")
+              AppLogger.network.info("📁 File search searching")
               
             case .fileSearchCallCompleted:
-              AppLogger.network.info("[OpenAIStreamingService] ✅ File search completed")
+              AppLogger.network.info("✅ File search completed")
             
             // Reasoning events - log reasoning process
             case .reasoningDelta(let reasoning):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🧠 Reasoning delta - Length: \(reasoning.delta.count)"
+                "🧠 Reasoning delta - Length: \(reasoning.delta.count)"
               )
               
             case .reasoningDone(let reasoning):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Reasoning done - Length: \(reasoning.reasoning.count)"
+                "✓ Reasoning done - Length: \(reasoning.reasoning.count)"
               )
             
             // Other events we don't need to handle but log for debugging
             case .outputTextAnnotationAdded:
-              AppLogger.network.debug("[OpenAIStreamingService] 📎 Text annotation added")
+              AppLogger.network.debug("📎 Text annotation added")
               
             case .audioDelta, .audioDone, .audioTranscriptDelta, .audioTranscriptDone:
-              AppLogger.network.debug("[OpenAIStreamingService] 🎵 Audio event")
+              AppLogger.network.debug("🎵 Audio event")
               
             case .codeInterpreterCallProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 💻 Code interpreter progress")
+              AppLogger.network.debug("💻 Code interpreter progress")
               
             case .computerCallProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🖥️ Computer call progress")
+              AppLogger.network.debug("🖥️ Computer call progress")
               
             case .reasoningSummaryPartAdded, .reasoningSummaryPartDone,
                  .reasoningSummaryTextDelta, .reasoningSummaryTextDone,
                  .reasoningSummaryDelta, .reasoningSummaryDone:
-              AppLogger.network.debug("[OpenAIStreamingService] 📊 Reasoning summary event")
+              AppLogger.network.debug("📊 Reasoning summary event")
               
             case .imageGenerationCallProgress, .imageGenerationCallPartialImage:
-              AppLogger.network.debug("[OpenAIStreamingService] 🎨 Image generation event")
+              AppLogger.network.debug("🎨 Image generation event")
               
             case .mcpCallArgumentsDelta, .mcpCallArgumentsDone,
                  .mcpCallProgress, .mcpListToolsProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🔌 MCP event")
+              AppLogger.network.debug("🔌 MCP event")
               
             case .responseQueued:
-              AppLogger.network.debug("[OpenAIStreamingService] ⏳ Response queued")
+              AppLogger.network.debug("⏳ Response queued")
             }
           }
           
           // If loop ended without completion event, call onComplete anyway
           if !isCompleted && accumulatedText.isEmpty == false {
             AppLogger.network.info(
-              "[OpenAIStreamingService] ✅ Stream ended without completion event - Total length: \(accumulatedText.count)"
+              "✅ Stream ended without completion event",
+              context: [
+                "Total length": accumulatedText.count,
+                "Content": "\(accumulatedText, privacy: .private)"
+              ]
             )
             DispatchQueue.main.async {
               onComplete(accumulatedText)
@@ -302,11 +346,17 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           }
           
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-          let errorMessage = "OpenAI API Error: \(statusCode) - \(responseBody)"
+          // Log error details for diagnosis
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ API request failed: \(errorMessage)"
+            "❌ API request failed",
+            context: [
+              "Status": statusCode,
+              "Response length": responseBody.count,
+              "Body": "\(responseBody, privacy: .sensitive)"
+            ]
           )
           
+          let errorMessage = "OpenAI API Error: \(statusCode) - \(responseBody)"
           DispatchQueue.main.async {
             onError(NSError(
               domain: "OpenAIStreamingService",
@@ -316,10 +366,16 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           }
           
         } catch {
+          // Log error details for diagnosis
+          let errorTypeName = String(describing: type(of: error))
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ Streaming request failed: \(error.localizedDescription)"
+            "❌ Streaming request failed",
+            context: [
+              "Type": errorTypeName,
+              "Message": "\(error.localizedDescription, privacy: .public)"
+            ]
           )
-          
+
           DispatchQueue.main.async {
             onError(error)
           }

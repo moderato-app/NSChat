@@ -48,6 +48,19 @@ extension SettingView {
             Image(systemName: "doc.text")
           }
         }
+        
+        VStack(alignment: .leading) {
+          Label("Log Policy", systemImage: "doc.text")
+          Picker("Log Policy", selection: $pref.logPolicy) {
+            ForEach(Privacy.allCases, id: \.self) { policy in
+              Text(policy.rawValue).tag(policy)
+            }
+          }
+          .pickerStyle(.segmented)
+          .labelsHidden()
+          .selectionFeedback(pref.logPolicy)
+        }
+
       }
     }
     .textCase(.none)
