@@ -16,6 +16,7 @@ public final class AppLogger {
     // Console destination with emoji
     let console = ConsoleDestination()
     console.useTerminalColors = false // Use emoji instead of terminal colors
+    console.format = "$DHH:mm:ss.SSS$d $C$L$c $N:$l $F - $M $X"
     SwiftyBeaver.addDestination(console)
     
     // File destination for persistence
