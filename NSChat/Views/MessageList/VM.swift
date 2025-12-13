@@ -138,7 +138,7 @@ extension InputAreaView {
       case .assistant: roleStr = "assistant"
       case .system: roleStr = "system"
       }
-      AppLogger.network.debug("\(i).\(roleStr): \(m.content)")
+      AppLogger.network.debug("\(i).\(roleStr): \(m.content, privacy: .private)")
     }
     AppLogger.network.debug("===whole message list ends===")
 
@@ -281,7 +281,7 @@ extension InputAreaView {
 
           aiMsg.onEOF(text: "")
           em.messageEvent.send(.eof)
-          
+
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
           AppLogger.data.debug("deltaTextCache cleared")
