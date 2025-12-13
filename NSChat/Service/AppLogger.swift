@@ -12,14 +12,8 @@ public struct PrivateValue {
   }
 
   var description: String {
-    var effectivePolicy = privacy
-
-    if effectivePolicy < Pref.shared.logPolicy {
-      effectivePolicy = Pref.shared.logPolicy
-    }
-
     // Otherwise, respect the privacy parameter
-    switch effectivePolicy {
+    switch privacy.effectivePolicy {
     case .public:
       return String(describing: value)
     case .sensitive:
@@ -271,7 +265,7 @@ extension String.StringInterpolation {
   /// Support for OSLog-style privacy parameter in string interpolation
   /// Usage: "Message: \(value, privacy: .private)"
   mutating func appendInterpolation<T>(_ value: T, privacy: Privacy) {
-    switch privacy {
+    switch privacy.effectivePolicy {
     case .public:
       appendInterpolation(value)
     case .private:
@@ -285,7 +279,7 @@ extension String.StringInterpolation {
   /// Support for OSLog-style privacy parameter with format
   /// Usage: "Duration: \(duration, format: .fixed(precision: 3), privacy: .public)"
   mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public) {
-    switch privacy {
+    switch privacy.effectivePolicy {
     case .public:
       switch format {
       case .fixed(let precision):
