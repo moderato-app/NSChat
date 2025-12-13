@@ -99,7 +99,7 @@ struct WheelPickerView: View {
               withAnimation {
                 value = newValue
               }
-              AppLogger.ui.debug("WheelPicker: Updated external value to \(newValue, format: .fixed(precision: 2))")
+              AppLogger.ui.debug("WheelPicker: Updated external value to \(String(format: "%.2f", newValue))")
             }
           }
         } catch {

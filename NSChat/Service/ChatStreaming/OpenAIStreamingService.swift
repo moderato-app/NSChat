@@ -175,119 +175,119 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
               )
               
             case .responseInProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🔄 Response in progress")
+              AppLogger.network.debug("🔄 Response in progress")
               
             case .responseIncomplete:
-              AppLogger.network.warning("[OpenAIStreamingService] ⚠️ Response incomplete")
+              AppLogger.network.warning("⚠️ Response incomplete")
             
             // Web search events - log search activity
             case .webSearchCallInProgress:
-              AppLogger.network.info("[OpenAIStreamingService] 🔍 Web search in progress")
+              AppLogger.network.info("🔍 Web search in progress")
               
             case .webSearchCallSearching:
-              AppLogger.network.info("[OpenAIStreamingService] 🔍 Web search searching")
+              AppLogger.network.info("🔍 Web search searching")
               
             case .webSearchCallCompleted:
-              AppLogger.network.info("[OpenAIStreamingService] ✅ Web search completed")
+              AppLogger.network.info("✅ Web search completed")
             
             // Output item events - track output structure
             case .outputItemAdded(let item):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ➕ Output item added - Index: \(item.index ?? -1)"
+                "➕ Output item added - Index: \(item.index ?? -1)"
               )
               
             case .outputItemDone(let item):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Output item done - Index: \(item.outputIndex ?? -1)"
+                "✓ Output item done - Index: \(item.outputIndex ?? -1)"
               )
             
             // Content part events - track content structure
             case .contentPartAdded(let part):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ➕ Content part added - Index: \(part.contentIndex ?? -1)"
+                "➕ Content part added - Index: \(part.contentIndex ?? -1)"
               )
               
             case .contentPartDone(let part):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Content part done - Index: \(part.contentIndex ?? -1)"
+                "✓ Content part done - Index: \(part.contentIndex ?? -1)"
               )
             
             // Text completion - marks end of text
             case .outputTextDone(let textDone):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Text done - Length: \(textDone.text.count)"
+                "✓ Text done - Length: \(textDone.text.count)"
               )
             
             // Refusal events - log when model refuses
             case .refusalDelta(let refusal):
               AppLogger.network.warning(
-                "[OpenAIStreamingService] 🚫 Refusal delta: \(refusal.delta)"
+                "🚫 Refusal delta: \(refusal.delta)"
               )
               
             case .refusalDone(let refusal):
               AppLogger.network.warning(
-                "[OpenAIStreamingService] 🚫 Refusal: \(refusal.refusal)"
+                "🚫 Refusal: \(refusal.refusal)"
               )
             
             // Function call events - log function calling activity
             case .functionCallArgumentsDelta(let args):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🔧 Function args delta - Length: \(args.delta.count)"
+                "🔧 Function args delta - Length: \(args.delta.count)"
               )
               
             case .functionCallArgumentsDone(let args):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Function args done - Length: \(args.arguments.count)"
+                "✓ Function args done - Length: \(args.arguments.count)"
               )
             
             // File search events - log file search activity
             case .fileSearchCallInProgress:
-              AppLogger.network.info("[OpenAIStreamingService] 📁 File search in progress")
+              AppLogger.network.info("📁 File search in progress")
               
             case .fileSearchCallSearching:
-              AppLogger.network.info("[OpenAIStreamingService] 📁 File search searching")
+              AppLogger.network.info("📁 File search searching")
               
             case .fileSearchCallCompleted:
-              AppLogger.network.info("[OpenAIStreamingService] ✅ File search completed")
+              AppLogger.network.info("✅ File search completed")
             
             // Reasoning events - log reasoning process
             case .reasoningDelta(let reasoning):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🧠 Reasoning delta - Length: \(reasoning.delta.count)"
+                "🧠 Reasoning delta - Length: \(reasoning.delta.count)"
               )
               
             case .reasoningDone(let reasoning):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] ✓ Reasoning done - Length: \(reasoning.reasoning.count)"
+                "✓ Reasoning done - Length: \(reasoning.reasoning.count)"
               )
             
             // Other events we don't need to handle but log for debugging
             case .outputTextAnnotationAdded:
-              AppLogger.network.debug("[OpenAIStreamingService] 📎 Text annotation added")
+              AppLogger.network.debug("📎 Text annotation added")
               
             case .audioDelta, .audioDone, .audioTranscriptDelta, .audioTranscriptDone:
-              AppLogger.network.debug("[OpenAIStreamingService] 🎵 Audio event")
+              AppLogger.network.debug("🎵 Audio event")
               
             case .codeInterpreterCallProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 💻 Code interpreter progress")
+              AppLogger.network.debug("💻 Code interpreter progress")
               
             case .computerCallProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🖥️ Computer call progress")
+              AppLogger.network.debug("🖥️ Computer call progress")
               
             case .reasoningSummaryPartAdded, .reasoningSummaryPartDone,
                  .reasoningSummaryTextDelta, .reasoningSummaryTextDone,
                  .reasoningSummaryDelta, .reasoningSummaryDone:
-              AppLogger.network.debug("[OpenAIStreamingService] 📊 Reasoning summary event")
+              AppLogger.network.debug("📊 Reasoning summary event")
               
             case .imageGenerationCallProgress, .imageGenerationCallPartialImage:
-              AppLogger.network.debug("[OpenAIStreamingService] 🎨 Image generation event")
+              AppLogger.network.debug("🎨 Image generation event")
               
             case .mcpCallArgumentsDelta, .mcpCallArgumentsDone,
                  .mcpCallProgress, .mcpListToolsProgress:
-              AppLogger.network.debug("[OpenAIStreamingService] 🔌 MCP event")
+              AppLogger.network.debug("🔌 MCP event")
               
             case .responseQueued:
-              AppLogger.network.debug("[OpenAIStreamingService] ⏳ Response queued")
+              AppLogger.network.debug("⏳ Response queued")
             }
           }
           

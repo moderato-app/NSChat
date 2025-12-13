@@ -284,7 +284,7 @@ extension InputAreaView {
           
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
-          AppLogger.data.debug("[VM] deltaTextCache cleared")
+          AppLogger.data.debug("deltaTextCache cleared")
 
           // Trigger auto-generate title if conditions are met
           TitleGenerationService.shared.generateTitleAuto(chat: chat, modelContext: modelContext)
@@ -309,7 +309,7 @@ extension InputAreaView {
 
           deltaTextCache[sessionId] = ""
           countTextCache[sessionId] = 0
-          AppLogger.data.debug("[VM] deltaTextCache cleared")
+          AppLogger.data.debug("deltaTextCache cleared")
         }
       }
     )

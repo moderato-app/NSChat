@@ -15,19 +15,19 @@ final class TitleGenerationService {
   func generateTitleAuto(chat: Chat, modelContext: ModelContext) {
     // Check condition 1: User has enabled auto-generate title
     guard Pref.shared.autoGenerateTitle else {
-      AppLogger.data.debug("[TitleGenerationService] Auto-generate title is disabled")
+      AppLogger.data.debug("Auto-generate title is disabled")
       return
     }
     
     // Check condition 2: Chat name is still the default "New Chat"
     guard chat.name == ChatConstants.DEFAULT_CHAT_NAME else {
-      AppLogger.data.debug("[TitleGenerationService] Chat name is not default, skipping title generation")
+      AppLogger.data.debug("Chat name is not default, skipping title generation")
       return
     }
     
     // Check condition 3: This is one of the first 3 AI messages
     guard chat.messages.count < 6 else {
-      AppLogger.data.debug("[TitleGenerationService] Chat has more than 5 messages, skipping title generation")
+      AppLogger.data.debug("Chat has more than 5 messages, skipping title generation")
       return
     }
     
@@ -47,7 +47,7 @@ final class TitleGenerationService {
     onStart: (() -> Void)? = nil,
     onComplete: (() -> Void)? = nil
   ) {
-    AppLogger.data.info("[TitleGenerationService] Manual title generation requested")
+    AppLogger.data.info("Manual title generation requested")
     generateTitleCore(chat: chat, modelContext: modelContext, onStart: onStart, onComplete: onComplete)
   }
   
@@ -65,7 +65,7 @@ final class TitleGenerationService {
   ) {
     // Check condition: Selected model exists
     guard let model = chat.option.model else {
-      AppLogger.data.debug("[TitleGenerationService] No model selected, cannot generate title")
+      AppLogger.data.debug("No model selected, cannot generate title")
       return
     }
     
@@ -115,7 +115,7 @@ final class TitleGenerationService {
       """
     }
 
-    AppLogger.data.debug("[TitleGenerationService] Prompt: \(prompt)")
+    AppLogger.data.debug("Prompt: \(prompt)")
         
     // Prepare messages for API call
     let chatMessages = [ChatMessage(type: .user, content: prompt)]
@@ -144,7 +144,7 @@ final class TitleGenerationService {
       messages: chatMessages,
       config: config,
       onStart: {
-        AppLogger.data.debug("[TitleGenerationService] Title generation started")
+        AppLogger.data.debug("Title generation started")
         Task { @MainActor in
           onStart?()
         }
@@ -170,7 +170,7 @@ final class TitleGenerationService {
             
             do {
               try modelContext.save()
-              AppLogger.data.info("[TitleGenerationService] Title generated successfully: \(cleanTitle)")
+              AppLogger.data.info("Title generated successfully: \(cleanTitle)")
             } catch {
               AppLogger.logError(.from(
                 error: error,
@@ -180,7 +180,7 @@ final class TitleGenerationService {
               ))
             }
           } else {
-            AppLogger.data.warning("[TitleGenerationService] Generated title is empty, keeping default name")
+            AppLogger.data.warning("Generated title is empty, keeping default name")
           }
           
           onComplete?()
@@ -188,7 +188,7 @@ final class TitleGenerationService {
       },
       onError: { error in
         Task { @MainActor in
-          AppLogger.error.error("[TitleGenerationService] Failed to generate title: \(error.localizedDescription)")
+          AppLogger.error.error("Failed to generate title: \(error.localizedDescription)")
           onComplete?()
         }
       }

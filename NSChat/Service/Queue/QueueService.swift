@@ -29,7 +29,7 @@ final class QueueService {
   
   private func scheduleOpenRouterModelFetch() {
     guard let manager = queueManager else {
-      AppLogger.error.error("[QueueService] QueueManager not initialized")
+      AppLogger.error.error("QueueManager not initialized")
       return
     }
     
@@ -47,7 +47,7 @@ final class QueueService {
       .periodic(limit: .unlimited, interval: 24 * 60 * 60) // Repeat every 24 hours after success
       .schedule(manager: manager)
     
-    AppLogger.data.info("[QueueService] Scheduled OpenRouter model fetch job (runs immediately on startup, then every 24 hours)")
+    AppLogger.data.info("Scheduled OpenRouter model fetch job (runs immediately on startup, then every 24 hours)")
   }
 }
 

@@ -27,7 +27,7 @@ struct GeminiModelFetcher: ModelFetcher {
       urlComponents.queryItems = queryItems.isEmpty ? nil : queryItems
       
       guard let url = urlComponents.url else {
-        AppLogger.error.error("[GeminiModelFetcher] Invalid URL: \(baseURL, privacy: .public)")
+        AppLogger.error.error("Invalid URL: \(baseURL)")
         throw ModelFetchError.invalidURL
       }
       
@@ -45,7 +45,7 @@ struct GeminiModelFetcher: ModelFetcher {
       let duration = Date().timeIntervalSince(startTime)
       
       guard let httpResponse = response as? HTTPURLResponse else {
-        AppLogger.error.error("[GeminiModelFetcher] Invalid response type")
+        AppLogger.error.error("Invalid response type")
         throw ModelFetchError.invalidResponse
       }
       
@@ -53,7 +53,7 @@ struct GeminiModelFetcher: ModelFetcher {
       
       guard httpResponse.statusCode == 200 else {
         let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-        AppLogger.error.error("[GeminiModelFetcher] API error: HTTP \(httpResponse.statusCode) - \(errorMessage, privacy: .private)")
+        AppLogger.error.error("API error: HTTP \(httpResponse.statusCode) - \(errorMessage)")
         throw ModelFetchError.apiError("HTTP \(httpResponse.statusCode): \(errorMessage)")
       }
       
@@ -79,7 +79,7 @@ struct GeminiModelFetcher: ModelFetcher {
         modelsResponse = try decoder.decode(GeminiModelsResponse.self, from: data)
       } catch {
         let dataPreview = String(data: data.prefix(500), encoding: .utf8) ?? "Unable to decode as UTF-8"
-        AppLogger.error.error("[GeminiModelFetcher] Decoding error | Data size: \(data.count) bytes | Error: \(error.localizedDescription) | Preview: \(dataPreview, privacy: .private)")
+        AppLogger.error.error("Decoding error | Data size: \(data.count) bytes | Error: \(error.localizedDescription) | Preview: \(dataPreview)")
         throw ModelFetchError.decodingError("Failed to decode Gemini models response: \(error.localizedDescription)")
       }
       
@@ -97,7 +97,7 @@ struct GeminiModelFetcher: ModelFetcher {
       }
       
       AppLogger.network.debug(
-        "[GeminiModelFetcher] Received \(modelsResponse.models.count) models from API"
+        "Received \(modelsResponse.models.count) models from API"
       )
       
       // Filter models that support generateContent method
@@ -107,21 +107,21 @@ struct GeminiModelFetcher: ModelFetcher {
         let supportsGenerateContent = methods.contains("generateContent")
         if !supportsGenerateContent {
           AppLogger.network.debug(
-            "[GeminiModelFetcher] Skipping model \(model.name) - does not support generateContent"
+            "Skipping model \(model.name) - does not support generateContent"
           )
         }
         return supportsGenerateContent
       }
       
       AppLogger.network.debug(
-        "[GeminiModelFetcher] \(supportedModels.count) models support generateContent"
+        "\(supportedModels.count) models support generateContent"
       )
       
       // Convert to ModelInfo
       let modelInfos = supportedModels.compactMap { model -> ModelInfo? in
         // Extract model ID (use baseModelId if available, otherwise extract from name)
         guard let modelId = extractModelId(from: model) else {
-          AppLogger.network.debug("[GeminiModelFetcher] Skipping model with invalid name: \(model.name)")
+          AppLogger.network.debug("Skipping model with invalid name: \(model.name)")
           return nil
         }
         
@@ -136,7 +136,7 @@ struct GeminiModelFetcher: ModelFetcher {
       }
       
       AppLogger.network.debug(
-        "[GeminiModelFetcher] Converted \(modelInfos.count) models to ModelInfo"
+        "Converted \(modelInfos.count) models to ModelInfo"
       )
       
       allModels.append(contentsOf: modelInfos)
@@ -144,19 +144,19 @@ struct GeminiModelFetcher: ModelFetcher {
       pageCount += 1
       
       AppLogger.network.info(
-        "[GeminiModelFetcher] Fetched page \(pageCount) - \(modelInfos.count) models (total: \(allModels.count))"
+        "Fetched page \(pageCount) - \(modelInfos.count) models (total: \(allModels.count))"
       )
       
     } while nextPageToken != nil && pageCount < maxPages
     
     if pageCount >= maxPages {
       AppLogger.network.warning(
-        "[GeminiModelFetcher] Reached max pages limit (\(maxPages)), stopping pagination"
+        "Reached max pages limit (\(maxPages)), stopping pagination"
       )
     }
     
     AppLogger.network.info(
-      "[GeminiModelFetcher] ✅ Fetched \(allModels.count) models in \(pageCount) page(s)"
+      "✅ Fetched \(allModels.count) models in \(pageCount) page(s)"
     )
     
     return allModels
