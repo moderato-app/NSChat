@@ -42,7 +42,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
         
         do {
           AppLogger.network.info(
-            "[OpenAIStreamingService] 🚀 Starting streaming request - Model: \(modelID)"
+            "🚀 Starting streaming request - Model: \(modelID)"
           )
           
           // Create OpenAI service (BYOK mode)
@@ -50,6 +50,10 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           if let endpoint = config.endpoint, !endpoint.isEmpty {
             do {
               let res = try parseURL(endpoint)
+              // Log endpoint base URL for diagnosis (without query params)
+              AppLogger.network.debug(
+                "Using custom endpoint: \(res.base, privacy: .sensitive)"
+              )
               openAIService = AIProxy.openAIDirectService(
                 unprotectedAPIKey: apiKey,
                 baseURL: res.base
@@ -102,6 +106,16 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             tools: tools
           )
           
+          // Log request configuration for diagnosis
+          AppLogger.network.debug(
+            "Request config",
+            context: [
+              "messages": messages.count,
+              "temperature": config.temperature?.description ?? "nil",
+              "tools": tools != nil ? "enabled" : "disabled"
+            ]
+          )
+          
           // Notify start
           DispatchQueue.main.async {
             onStart()
@@ -126,13 +140,22 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
               }
               
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 📝 Text delta received - Length: \(textDelta.delta.count): \(textDelta.delta)"
+                "📝 Text delta received",
+                context: [
+                  "Length": textDelta.delta.count,
+                  "Value": "\(textDelta.delta, privacy: .private)"
+                ]
               )
             
             // Response completed - marks successful completion
             case .responseCompleted(let completed):
               AppLogger.network.info(
-                "[OpenAIStreamingService] ✅ Response completed - ID: \(completed.response.id ?? "unknown"), Total length: \(accumulatedText.count)"
+                "✅ Response completed",
+                context: [
+                  "ID": "\(completed.response.id ?? "unknown", privacy: .sensitive)",
+                  "Total length": accumulatedText.count,
+                  "Content": "\(accumulatedText, privacy: .private)"
+                ]
               )
               
               isCompleted = true
@@ -143,7 +166,11 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Error event - handle API errors
             case .error(let errorEvent):
               AppLogger.error.error(
-                "[OpenAIStreamingService] ❌ Error event - Code: \(errorEvent.code), Message: \(errorEvent.message)"
+                "❌ Error event",
+                context: [
+                  "Code": errorEvent.code,
+                  "Message": "\(errorEvent.message, privacy: .public)"
+                ]
               )
               
               DispatchQueue.main.async {
@@ -157,9 +184,13 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Response failed - handle failed responses
             case .responseFailed(let failed):
               AppLogger.error.error(
-                "[OpenAIStreamingService] ❌ Response failed - ID: \(failed.response.id ?? "unknown")"
+                "❌ Response failed",
+                context: [
+                  "ID": "\(failed.response.id ?? "unknown", privacy: .sensitive)",
+                  "Error description": "\(String(describing: failed.response.error), privacy: .public)"
+                ]
               )
-              
+                            
               DispatchQueue.main.async {
                 onError(NSError(
                   domain: "OpenAIStreamingService",
@@ -171,7 +202,11 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             // Lifecycle events - log for debugging
             case .responseCreated(let created):
               AppLogger.network.debug(
-                "[OpenAIStreamingService] 🎬 Response created - ID: \(created.response.id ?? "unknown")"
+                "🎬 Response created",
+                context: [
+                  "ID": "\(created.response.id ?? "unknown", privacy: .sensitive)",
+                  "Sequence number": created.sequenceNumber ?? -1
+                ]
               )
               
             case .responseInProgress:
@@ -220,13 +255,18 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
             
             // Refusal events - log when model refuses
             case .refusalDelta(let refusal):
-              AppLogger.network.warning(
-                "🚫 Refusal delta: \(refusal.delta)"
-              )
+              AppLogger.network.warning("🚫 Refusal delta", context: [
+                "count": refusal.delta.count,
+                "value": "\(refusal.delta, privacy: .private)"
+              ])
               
             case .refusalDone(let refusal):
               AppLogger.network.warning(
-                "🚫 Refusal: \(refusal.refusal)"
+                "🚫 Refusal done",
+                context: [
+                  "Length": refusal.refusal.count,
+                  "Content": "\(refusal.refusal, privacy: .private)"
+                ]
               )
             
             // Function call events - log function calling activity
@@ -294,7 +334,11 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           // If loop ended without completion event, call onComplete anyway
           if !isCompleted && accumulatedText.isEmpty == false {
             AppLogger.network.info(
-              "✅ Stream ended without completion event - Total length: \(accumulatedText.count)"
+              "✅ Stream ended without completion event",
+              context: [
+                "Total length": accumulatedText.count,
+                "Content": "\(accumulatedText, privacy: .private)"
+              ]
             )
             DispatchQueue.main.async {
               onComplete(accumulatedText)
@@ -302,11 +346,17 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           }
           
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
-          let errorMessage = "OpenAI API Error: \(statusCode) - \(responseBody)"
+          // Log error details for diagnosis
           AppLogger.error.error(
-            "❌ API request failed: \(errorMessage, privacy: .private)"
+            "❌ API request failed",
+            context: [
+              "Status": statusCode,
+              "Response length": responseBody.count,
+              "Body": "\(responseBody, privacy: .sensitive)"
+            ]
           )
           
+          let errorMessage = "OpenAI API Error: \(statusCode) - \(responseBody)"
           DispatchQueue.main.async {
             onError(NSError(
               domain: "OpenAIStreamingService",
@@ -316,10 +366,16 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           }
           
         } catch {
+          // Log error details for diagnosis
+          let errorTypeName = String(describing: type(of: error))
           AppLogger.error.error(
-            "❌ Streaming request failed: \(error.localizedDescription, privacy: .private)"
+            "❌ Streaming request failed",
+            context: [
+              "Type": errorTypeName,
+              "Message": "\(error.localizedDescription, privacy: .public)"
+            ]
           )
-          
+
           DispatchQueue.main.async {
             onError(error)
           }

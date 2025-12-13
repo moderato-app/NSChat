@@ -12,12 +12,12 @@ public enum Privacy {
 public struct PrivateValue {
   let value: Any
   let privacy: Privacy
-  
+
   public init(_ value: Any, privacy: Privacy = .private) {
     self.value = value
     self.privacy = privacy
   }
-  
+
   var description: String {
     switch privacy {
     case .public:
@@ -28,7 +28,7 @@ public struct PrivateValue {
       return maskSensitiveValue(String(describing: value))
     }
   }
-  
+
   /// Mask sensitive value: show front and back, mask the middle half
   private func maskSensitiveValue(_ value: String) -> String {
     guard value.count > 2 else {
@@ -44,11 +44,11 @@ public struct PrivateValue {
     let frontCount = max(1, value.count / 4)
     let backCount = max(1, value.count / 4)
     let middleMaskCount = value.count - frontCount - backCount
-    
+
     let frontPart = String(value.prefix(frontCount))
     let backPart = String(value.suffix(backCount))
     let middleMask = String(repeating: "*", count: middleMaskCount)
-    
+
     return frontPart + middleMask + backPart
   }
 }
@@ -56,79 +56,106 @@ public struct PrivateValue {
 /// Unified logging management system
 /// Uses SwiftyBeaver for logging with emoji console output and file persistence
 public final class AppLogger {
-  
+
   // MARK: - Initialization
-  
+
   private static var isInitialized = false
-  
+
   /// Initialize SwiftyBeaver destinations
   private static func initializeIfNeeded() {
     guard !isInitialized else { return }
-    
+
     // Console destination with emoji
     let console = ConsoleDestination()
-    console.useTerminalColors = false // Use emoji instead of terminal colors
+    console.useTerminalColors = false  // Use emoji instead of terminal colors
     console.format = "$DHH:mm:ss.SSS$d $C$L$c $N:$l $F - $M $X"
     SwiftyBeaver.addDestination(console)
-    
+
     // File destination for persistence
     // Format includes context for category information: $DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M $X
     let file = FileDestination()
     file.format = "$DHH:mm:ss.SSS$d $C$L$c $N:$l $F - $M $X"
     SwiftyBeaver.addDestination(file)
-    
+
     isInitialized = true
   }
-  
+
   // MARK: - Category Logger
-  
+
   /// Logger wrapper for a specific category
   public struct CategoryLogger {
     let category: String
-    
-    func verbose(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func verbose(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.verbose(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.verbose(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func debug(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func debug(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.debug(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.debug(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func info(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func info(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.info(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.info(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func warning(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func warning(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.warning(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.warning(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func error(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func error(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.error(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.error(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func critical(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func critical(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.critical(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.critical(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    func fault(_ message: @autoclosure () -> Any, file: String = #file, function: String = #function, line: Int = #line, context: [String: Any]? = nil) {
+
+    func fault(
+      _ message: @autoclosure () -> Any, file: String = #file, function: String = #function,
+      line: Int = #line, context: [String: Any]? = nil
+    ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
-      SwiftyBeaver.fault(message(), file: file, function: function, line: line, context: mergedContext)
+      SwiftyBeaver.fault(
+        message(), file: file, function: function, line: line, context: mergedContext)
     }
-    
-    
+
     private func mergeContext(_ context: [String: Any]?) -> [String: Any] {
       let categoryContext: [String: Any] = ["category": category]
       guard let existingContext = context else {
@@ -137,90 +164,95 @@ public final class AppLogger {
       return categoryContext.merging(existingContext) { (_, new) in new }
     }
   }
-  
+
   // MARK: - Log Categories
-  
+
   /// Network request related logs
   public static let network = CategoryLogger(category: "network")
-  
+
   /// UI interaction related logs
   public static let ui = CategoryLogger(category: "ui")
-  
+
   /// Data processing logs
   public static let data = CategoryLogger(category: "data")
-  
+
   /// Error and exception logs
   public static let error = CategoryLogger(category: "error")
-  
+
   /// Security and audit logs
   public static let audit = CategoryLogger(category: "audit")
-  
-  
+
   // MARK: - Structured Error Logging
-  
+
   /// Structured error information
   public struct ErrorContext {
     let error: Error
-    let operation: String       // Failed operation
-    let component: String        // Component where error occurred
-    let userMessage: String?     // User-friendly message (optional)
-    let metadata: [String: Any]? // Additional metadata
+    let operation: String  // Failed operation
+    let component: String  // Component where error occurred
+    let userMessage: String?  // User-friendly message (optional)
+    let metadata: [String: Any]?  // Additional metadata
   }
-  
+
   /// Log structured error
   /// - Parameter context: Error context
   /// - Returns: Returns user-friendly error message
   @discardableResult
   public static func logError(_ context: ErrorContext) -> String {
     initializeIfNeeded()
-    
-    // Build error context dictionary
-    var errorContext: [String: Any] = [
+
+    // Build base error context dictionary
+    let baseContext: [String: Any] = [
       "component": context.component,
       "operation": context.operation,
-      "error": context.error.localizedDescription
+      "error": context.error.localizedDescription,
     ]
-    
+
+    // Merge metadata into error context (metadata values take precedence)
+    let errorContext: [String: Any]
     if let metadata = context.metadata {
-      errorContext["metadata"] = metadata
+      errorContext = baseContext.merging(metadata) { (_, new) in new }
+    } else {
+      errorContext = baseContext
     }
-    
+
     // Internal debug information (full error)
-    error.error("""
+    error.error(
+      """
       [Error] Component:\(context.component) | \
       Operation:\(context.operation) | \
-      Error:\(context.error.localizedDescription) | \
-      Metadata:\(context.metadata?.description ?? "{}")
+      Error:\(context.error.localizedDescription)
       """, context: errorContext)
-    
+
     // Return sanitized user message
     return context.userMessage ?? "Operation failed, please try again later"
   }
-  
-  
+
   // MARK: - Convenience Methods
-  
+
   /// Log network request start
   public static func logNetworkRequest(url: String, method: String = "GET") {
     network.info("📤 Network request [\(method)] \(url)")
   }
-  
+
   /// Log network response
   public static func logNetworkResponse(url: String, statusCode: Int, duration: TimeInterval) {
     if (200..<300).contains(statusCode) {
-      network.info("📥 Network response [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s")
+      network.info(
+        "📥 Network response [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s"
+      )
     } else {
-      network.error("❌ Network error [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s")
+      network.error(
+        "❌ Network error [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s")
     }
   }
-  
+
 }
 
 // MARK: - Extension: Convenient Error Context Builder
 
-public extension AppLogger.ErrorContext {
+extension AppLogger.ErrorContext {
   /// Quickly create error context from operation and error
-  static func from(
+  public static func from(
     error: Error,
     operation: String,
     component: String,
@@ -242,20 +274,25 @@ extension String.StringInterpolation {
   /// Support for OSLog-style privacy parameter in string interpolation
   /// Usage: "Message: \(value, privacy: .private)"
   mutating func appendInterpolation<T>(_ value: T, privacy: Privacy) {
-    switch privacy {
-    case .public:
+    #if DEBUG
       appendInterpolation(value)
-    case .private:
-      appendLiteral("<private>")
-    case .sensitive:
-      let valueString = String(describing: value)
-      appendLiteral(maskSensitiveValue(valueString))
-    }
+    #else
+      switch privacy {
+      case .public:
+        appendInterpolation(value)
+      case .private:
+        appendLiteral("<private>")
+      case .sensitive:
+        let valueString = String(describing: value)
+        appendLiteral(maskSensitiveValue(valueString))
+      }
+    #endif
   }
-  
+
   /// Support for OSLog-style privacy parameter with format
   /// Usage: "Duration: \(duration, format: .fixed(precision: 3), privacy: .public)"
-  mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public) {
+  mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public)
+  {
     switch privacy {
     case .public:
       switch format {
@@ -275,7 +312,7 @@ extension String.StringInterpolation {
       appendLiteral(maskSensitiveValue(valueString))
     }
   }
-  
+
   /// Mask sensitive value: show front and back, mask the middle half
   private func maskSensitiveValue(_ value: String) -> String {
     guard value.count > 2 else {
@@ -291,11 +328,11 @@ extension String.StringInterpolation {
     let frontCount = max(1, value.count / 4)
     let backCount = max(1, value.count / 4)
     let middleMaskCount = value.count - frontCount - backCount
-    
+
     let frontPart = String(value.prefix(frontCount))
     let backPart = String(value.suffix(backCount))
     let middleMask = String(repeating: "*", count: middleMaskCount)
-    
+
     return frontPart + middleMask + backPart
   }
 }
