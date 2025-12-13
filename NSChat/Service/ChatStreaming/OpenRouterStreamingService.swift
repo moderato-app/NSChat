@@ -64,7 +64,7 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
           }
           
           if config.webSearch?.enabled == true {
-            AppLogger.network.info("[OpenRouterStreamingService] ℹ️ Web search requested but not supported for OpenRouter; sending without web search.")
+            AppLogger.network.info("ℹ️ Web search requested but not supported for OpenRouter; sending without web search.")
           }
           
           // Build request body

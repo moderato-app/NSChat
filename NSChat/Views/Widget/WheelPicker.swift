@@ -150,7 +150,7 @@ struct WheelPicker: View {
         withAnimation {
           value = newValue
         }
-        AppLogger.ui.debug("WheelPicker: value changed to \(newValue, format: .fixed(precision: 2))")
+        AppLogger.ui.debug("WheelPicker: value changed to \(String(format: "%.2f", newValue))")
       }
 
       // Play haptic feedback

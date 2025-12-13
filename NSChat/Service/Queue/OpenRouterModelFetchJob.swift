@@ -19,7 +19,7 @@ final class OpenRouterModelFetchJob: Job {
     Task {
       do {
         guard let modelContainer = modelContainerProvider?.container else {
-          AppLogger.error.error("[OpenRouterModelFetchJob] ModelContainer not available")
+          AppLogger.error.error("ModelContainer not available")
           callback.done(.fail(NSError(domain: "OpenRouterModelFetchJob", code: -1, userInfo: [NSLocalizedDescriptionKey: "ModelContainer not available"])))
           return
         }
@@ -37,7 +37,7 @@ final class OpenRouterModelFetchJob: Job {
         let models = try await fetcher.fetchModels(apiKey: "", endpoint: nil)
 
         guard !models.isEmpty else {
-          AppLogger.error.error("[OpenRouterModelFetchJob] No models fetched from OpenRouter")
+          AppLogger.error.error("No models fetched from OpenRouter")
           callback.done(.fail(NSError(domain: "OpenRouterModelFetchJob", code: -1, userInfo: [NSLocalizedDescriptionKey: "No models fetched from OpenRouter"])))
           return
         }
@@ -63,7 +63,7 @@ final class OpenRouterModelFetchJob: Job {
         // Save changes
         try modelContext.save()
         
-        AppLogger.data.info("[OpenRouterModelFetchJob] Successfully fetched and saved \(models.count) OpenRouter models")
+        AppLogger.data.info("Successfully fetched and saved \(models.count) OpenRouter models")
         callback.done(.success)
       } catch {
         AppLogger.logError(.from(
@@ -84,9 +84,9 @@ final class OpenRouterModelFetchJob: Job {
   func onRemove(result: JobCompletion) {
     switch result {
     case .success:
-      AppLogger.data.info("[OpenRouterModelFetchJob] Job completed successfully")
+      AppLogger.data.info("Job completed successfully")
     case .fail(let error):
-      AppLogger.error.error("[OpenRouterModelFetchJob] Job failed: \(error.localizedDescription, privacy: .public)")
+      AppLogger.error.error("Job failed: \(error.localizedDescription)")
     }
   }
 }
