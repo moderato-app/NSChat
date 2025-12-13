@@ -41,7 +41,6 @@ extension SettingView {
         .pickerStyle(.segmented)
         .labelsHidden()
         .selectionFeedback(pref.newChatPrefWebSearchContextSize)
-        .disabled(!pref.newChatPrefWebSearchEnabled)
       }
 
     } header: {
