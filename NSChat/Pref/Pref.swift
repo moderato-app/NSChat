@@ -90,4 +90,11 @@ public enum Privacy: String, CaseIterable, Codable, Comparable {
     }
     return lhsIndex < rhsIndex
   }
+
+  var effectivePolicy: Self {
+    if self < Pref.shared.logPolicy {
+      return Pref.shared.logPolicy
+    }
+    return self
+  }
 }
