@@ -19,11 +19,15 @@ class Pref: ObservableObject {
 
   // Pref for new chat
   @AppStorage("newChatPref-historyMessageCount") var newChatPrefHistoryMessageCount: Int = 4
+  @AppStorage("newChatPref-webSearchEnabled") var newChatPrefWebSearchEnabled: Bool = false
   @AppStorage("newChatPref-webSearchContextSize") var newChatPrefWebSearchContextSize: WebSearchContextSize = .low
   @AppStorage("autoGenerateTitle") var autoGenerateTitle: Bool = true
 
   // Fill data record
   @AppStorage("fillDataRecordPrompts") var fillDataRecordPrompts: Bool = false
+
+  // Log policy
+  @AppStorage("logPolicy") var logPolicy: Privacy = .private
 
   func reset() {
     let newPref = Pref()
@@ -34,8 +38,10 @@ class Pref: ObservableObject {
     self.colorScheme = newPref.colorScheme
     self.fillDataRecordPrompts = newPref.fillDataRecordPrompts
     self.newChatPrefHistoryMessageCount = newPref.newChatPrefHistoryMessageCount
+    self.newChatPrefWebSearchEnabled = newPref.newChatPrefWebSearchEnabled
     self.newChatPrefWebSearchContextSize = newPref.newChatPrefWebSearchContextSize
     self.autoGenerateTitle = newPref.autoGenerateTitle
+    self.logPolicy = newPref.logPolicy
   }
 }
 
@@ -65,5 +71,23 @@ extension Pref {
     case .system:
       return nil
     }
+  }
+}
+
+private let privacyOrder: [Privacy] = [.private, .sensitive, .public]
+
+/// Privacy level for log entries (compatible with OSLog privacy parameter)
+public enum Privacy: String, CaseIterable, Codable, Comparable {
+  case `private` = "Private"
+  case sensitive = "Sensitive"
+  case `public` = "Public"
+
+  public static func < (lhs: Privacy, rhs: Privacy) -> Bool {
+    guard let lhsIndex = privacyOrder.firstIndex(of: lhs),
+          let rhsIndex = privacyOrder.firstIndex(of: rhs)
+    else {
+      return false
+    }
+    return lhsIndex < rhsIndex
   }
 }
