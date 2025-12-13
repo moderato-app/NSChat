@@ -1,13 +1,6 @@
 import Foundation
 import SwiftyBeaver
 
-/// Privacy level for log entries (compatible with OSLog privacy parameter)
-public enum Privacy {
-  case `public`
-  case `private`
-  case sensitive
-}
-
 /// Wrapper for values with privacy marking
 public struct PrivateValue {
   let value: Any
@@ -19,13 +12,20 @@ public struct PrivateValue {
   }
 
   var description: String {
-    switch privacy {
+    var effectivePolicy = privacy
+
+    if effectivePolicy < Pref.shared.logPolicy {
+      effectivePolicy = Pref.shared.logPolicy
+    }
+
+    // Otherwise, respect the privacy parameter
+    switch effectivePolicy {
     case .public:
       return String(describing: value)
-    case .private:
-      return "<private>"
     case .sensitive:
       return maskSensitiveValue(String(describing: value))
+    case .private:
+      return "<private>"
     }
   }
 
@@ -55,8 +55,7 @@ public struct PrivateValue {
 
 /// Unified logging management system
 /// Uses SwiftyBeaver for logging with emoji console output and file persistence
-public final class AppLogger {
-
+public enum AppLogger {
   // MARK: - Initialization
 
   private static var isInitialized = false
@@ -67,7 +66,7 @@ public final class AppLogger {
 
     // Console destination with emoji
     let console = ConsoleDestination()
-    console.useTerminalColors = false  // Use emoji instead of terminal colors
+    console.useTerminalColors = false // Use emoji instead of terminal colors
     console.format = "$DHH:mm:ss.SSS$d $C$L$c $N:$l $F - $M $X"
     SwiftyBeaver.addDestination(console)
 
@@ -161,7 +160,7 @@ public final class AppLogger {
       guard let existingContext = context else {
         return categoryContext
       }
-      return categoryContext.merging(existingContext) { (_, new) in new }
+      return categoryContext.merging(existingContext) { _, new in new }
     }
   }
 
@@ -187,10 +186,10 @@ public final class AppLogger {
   /// Structured error information
   public struct ErrorContext {
     let error: Error
-    let operation: String  // Failed operation
-    let component: String  // Component where error occurred
-    let userMessage: String?  // User-friendly message (optional)
-    let metadata: [String: Any]?  // Additional metadata
+    let operation: String // Failed operation
+    let component: String // Component where error occurred
+    let userMessage: String? // User-friendly message (optional)
+    let metadata: [String: Any]? // Additional metadata
   }
 
   /// Log structured error
@@ -210,7 +209,7 @@ public final class AppLogger {
     // Merge metadata into error context (metadata values take precedence)
     let errorContext: [String: Any]
     if let metadata = context.metadata {
-      errorContext = baseContext.merging(metadata) { (_, new) in new }
+      errorContext = baseContext.merging(metadata) { _, new in new }
     } else {
       errorContext = baseContext
     }
@@ -236,7 +235,7 @@ public final class AppLogger {
 
   /// Log network response
   public static func logNetworkResponse(url: String, statusCode: Int, duration: TimeInterval) {
-    if (200..<300).contains(statusCode) {
+    if (200 ..< 300).contains(statusCode) {
       network.info(
         "📥 Network response [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s"
       )
@@ -245,14 +244,13 @@ public final class AppLogger {
         "❌ Network error [\(statusCode)] \(url) - Duration: \(String(format: "%.3f", duration))s")
     }
   }
-
 }
 
 // MARK: - Extension: Convenient Error Context Builder
 
-extension AppLogger.ErrorContext {
+public extension AppLogger.ErrorContext {
   /// Quickly create error context from operation and error
-  public static func from(
+  static func from(
     error: Error,
     operation: String,
     component: String,
@@ -263,8 +261,7 @@ extension AppLogger.ErrorContext {
       operation: operation,
       component: component,
       userMessage: userMessage,
-      metadata: nil
-    )
+      metadata: nil)
   }
 }
 
@@ -274,25 +271,20 @@ extension String.StringInterpolation {
   /// Support for OSLog-style privacy parameter in string interpolation
   /// Usage: "Message: \(value, privacy: .private)"
   mutating func appendInterpolation<T>(_ value: T, privacy: Privacy) {
-    #if DEBUG
+    switch privacy {
+    case .public:
       appendInterpolation(value)
-    #else
-      switch privacy {
-      case .public:
-        appendInterpolation(value)
-      case .private:
-        appendLiteral("<private>")
-      case .sensitive:
-        let valueString = String(describing: value)
-        appendLiteral(maskSensitiveValue(valueString))
-      }
-    #endif
+    case .private:
+      appendLiteral("<private>")
+    case .sensitive:
+      let valueString = String(describing: value)
+      appendLiteral(maskSensitiveValue(valueString))
+    }
   }
 
   /// Support for OSLog-style privacy parameter with format
   /// Usage: "Duration: \(duration, format: .fixed(precision: 3), privacy: .public)"
-  mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public)
-  {
+  mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public) {
     switch privacy {
     case .public:
       switch format {

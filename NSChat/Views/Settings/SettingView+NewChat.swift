@@ -25,7 +25,13 @@ extension SettingView {
       }
 
       VStack(alignment: .leading) {
-        Label("Web Search Context", systemImage: "globe")
+        HStack {
+          Label("Web Search Context", systemImage: "square.3.layers.3d.down.left")
+            .modifier(RippleEffect(at: .zero, trigger: pref.newChatPrefWebSearchEnabled))
+          Toggle("", isOn: $pref.newChatPrefWebSearchEnabled)
+        }
+        .selectionFeedback(pref.newChatPrefWebSearchEnabled)
+
         Picker("Web Search Context", selection: $pref.newChatPrefWebSearchContextSize) {
           ForEach(WebSearchContextSize.allCases, id: \.self) { size in
             Text(size.title)
@@ -35,6 +41,7 @@ extension SettingView {
         .pickerStyle(.segmented)
         .labelsHidden()
         .selectionFeedback(pref.newChatPrefWebSearchContextSize)
+        .disabled(!pref.newChatPrefWebSearchEnabled)
       }
 
     } header: {
