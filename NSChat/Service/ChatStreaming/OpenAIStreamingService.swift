@@ -28,7 +28,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
         // Validate required config parameters
         guard let apiKey = config.apiKey, let modelID = config.modelID else {
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ Config error: missing apiKey or modelID"
+            "❌ Config error: missing apiKey or modelID"
           )
           DispatchQueue.main.async {
             onError(NSError(
@@ -294,7 +294,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           // If loop ended without completion event, call onComplete anyway
           if !isCompleted && accumulatedText.isEmpty == false {
             AppLogger.network.info(
-              "[OpenAIStreamingService] ✅ Stream ended without completion event - Total length: \(accumulatedText.count)"
+              "✅ Stream ended without completion event - Total length: \(accumulatedText.count)"
             )
             DispatchQueue.main.async {
               onComplete(accumulatedText)
@@ -304,7 +304,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
           let errorMessage = "OpenAI API Error: \(statusCode) - \(responseBody)"
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ API request failed: \(errorMessage)"
+            "❌ API request failed: \(errorMessage, privacy: .private)"
           )
           
           DispatchQueue.main.async {
@@ -317,7 +317,7 @@ class OpenAIStreamingService: ChatStreamingServiceProtocol {
           
         } catch {
           AppLogger.error.error(
-            "[OpenAIStreamingService] ❌ Streaming request failed: \(error.localizedDescription)"
+            "❌ Streaming request failed: \(error.localizedDescription, privacy: .private)"
           )
           
           DispatchQueue.main.async {

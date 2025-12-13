@@ -86,7 +86,7 @@ final class OpenRouterModelFetchJob: Job {
     case .success:
       AppLogger.data.info("Job completed successfully")
     case .fail(let error):
-      AppLogger.error.error("Job failed: \(error.localizedDescription)")
+      AppLogger.error.error("Job failed: \(error.localizedDescription, privacy: .public)")
     }
   }
 }

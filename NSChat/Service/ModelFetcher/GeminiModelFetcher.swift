@@ -27,7 +27,7 @@ struct GeminiModelFetcher: ModelFetcher {
       urlComponents.queryItems = queryItems.isEmpty ? nil : queryItems
       
       guard let url = urlComponents.url else {
-        AppLogger.error.error("Invalid URL: \(baseURL)")
+        AppLogger.error.error("Invalid URL: \(baseURL, privacy: .public)")
         throw ModelFetchError.invalidURL
       }
       
@@ -53,7 +53,7 @@ struct GeminiModelFetcher: ModelFetcher {
       
       guard httpResponse.statusCode == 200 else {
         let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-        AppLogger.error.error("API error: HTTP \(httpResponse.statusCode) - \(errorMessage)")
+        AppLogger.error.error("API error: HTTP \(httpResponse.statusCode) - \(errorMessage, privacy: .private)")
         throw ModelFetchError.apiError("HTTP \(httpResponse.statusCode): \(errorMessage)")
       }
       
@@ -79,7 +79,7 @@ struct GeminiModelFetcher: ModelFetcher {
         modelsResponse = try decoder.decode(GeminiModelsResponse.self, from: data)
       } catch {
         let dataPreview = String(data: data.prefix(500), encoding: .utf8) ?? "Unable to decode as UTF-8"
-        AppLogger.error.error("Decoding error | Data size: \(data.count) bytes | Error: \(error.localizedDescription) | Preview: \(dataPreview)")
+        AppLogger.error.error("Decoding error | Data size: \(data.count) bytes | Error: \(error.localizedDescription) | Preview: \(dataPreview, privacy: .private)")
         throw ModelFetchError.decodingError("Failed to decode Gemini models response: \(error.localizedDescription)")
       }
       

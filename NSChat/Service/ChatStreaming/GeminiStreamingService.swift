@@ -28,7 +28,7 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
         // Validate required config parameters
         guard let apiKey = config.apiKey, let modelID = config.modelID else {
           AppLogger.error.error(
-            "[GeminiStreamingService] ❌ Config error: missing apiKey or modelID"
+            "❌ Config error: missing apiKey or modelID"
           )
           DispatchQueue.main.async {
             onError(NSError(
@@ -242,7 +242,7 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
         } catch AIProxyError.unsuccessfulRequest(let statusCode, let responseBody) {
           let errorMessage = "Gemini API Error: \(statusCode) - \(responseBody)"
           AppLogger.error.error(
-            "[GeminiStreamingService] ❌ API request failed: \(errorMessage)"
+            "❌ API request failed: \(errorMessage, privacy: .private)"
           )
           
           DispatchQueue.main.async {
@@ -255,7 +255,7 @@ class GeminiStreamingService: ChatStreamingServiceProtocol {
           
         } catch {
           AppLogger.error.error(
-            "[GeminiStreamingService] ❌ Streaming request failed: \(error.localizedDescription)"
+            "❌ Streaming request failed: \(error.localizedDescription, privacy: .private)"
           )
           
           DispatchQueue.main.async {

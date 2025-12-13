@@ -9,7 +9,7 @@ struct OpenAIModelFetcher: ModelFetcher {
       : endpoint!
     
     guard let url = URL(string: urlString) else {
-      AppLogger.error.error("Invalid URL: \(urlString)")
+      AppLogger.error.error("Invalid URL: \(urlString, privacy: .public)")
       throw ModelFetchError.invalidURL
     }
     
@@ -46,7 +46,7 @@ struct OpenAIModelFetcher: ModelFetcher {
     let decoder = JSONDecoder()
     guard let modelsResponse = try? decoder.decode(OpenAIModelsResponse.self, from: data) else {
       let dataPreview = String(data: data.prefix(200), encoding: .utf8) ?? "Unable to decode as UTF-8"
-      AppLogger.error.error("Decoding error | Data size: \(data.count) bytes | Preview: \(dataPreview)")
+      AppLogger.error.error("Decoding error | Data size: \(data.count) bytes | Preview: \(dataPreview, privacy: .private)")
       throw ModelFetchError.decodingError("Failed to decode OpenAI models response")
     }
     
