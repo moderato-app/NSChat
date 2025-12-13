@@ -170,7 +170,7 @@ final class TitleGenerationService {
             
             do {
               try modelContext.save()
-              AppLogger.data.info("Title generated successfully: \(cleanTitle)")
+              AppLogger.data.info("Title generated successfully: \(cleanTitle, privacy: .private)")
             } catch {
               AppLogger.logError(.from(
                 error: error,

@@ -1,5 +1,5 @@
-import SwiftUI
 import os
+import SwiftUI
 
 private let maxLogEntriesToShow = 500
 
@@ -55,7 +55,6 @@ struct LogExportSheet: View {
           Text("Select time range for logs")
             .font(.subheadline)
             .foregroundStyle(.secondary)
-
             .padding(.vertical, 4)
 
           Picker("Time Range", selection: $selectedRange) {
@@ -64,7 +63,7 @@ struct LogExportSheet: View {
             }
           }
           .pickerStyle(.menu)
-          
+
           if selectedRange != .none {
             Text(
               "⚠️ Logs may contain sensitive information such as API requests, conversation content, and error details. Please review before sending."
@@ -142,8 +141,6 @@ struct LogExportSheet: View {
           .frame(maxWidth: .infinity, alignment: .leading)
         }
       } header: {
-        Text("Log Preview")
-      } footer: {
         Text("Showing \(min(logs.count, maxLogEntriesToShow)) of \(logs.count) log entries")
       }
       .textCase(.none)
@@ -248,32 +245,32 @@ struct LogExportSheet: View {
     let scale = screen.scale
 
     var info = """
-      Please describe the issue here:
+    Please describe the issue here:
 
 
 
-      ────────────────────────────────
-      Device Information:
-      ────────────────────────────────
-      Device Model: \(deviceModel)
-      Device Name: \(deviceName)
-      Model Code: \(modelCode ?? "Unknown")
-      System Version: iOS \(systemVersion)
+    ────────────────────────────────
+    Device Information:
+    ────────────────────────────────
+    Device Model: \(deviceModel)
+    Device Name: \(deviceName)
+    Model Code: \(modelCode ?? "Unknown")
+    System Version: iOS \(systemVersion)
 
-      App Version: \(appVersion) (\(buildNumber))
+    App Version: \(appVersion) (\(buildNumber))
 
-      Screen Size: \(Int(screenSize.width))×\(Int(screenSize.height))
-      Screen Scale: \(scale)x
-      """
+    Screen Size: \(Int(screenSize.width))×\(Int(screenSize.height))
+    Screen Scale: \(scale)x
+    """
 
     // Only include log info if a time range is selected
     if selectedRange != .none {
       info += """
 
 
-        Time Range: \(selectedRange.rawValue)
-        Log Count: \(logs.count) entries
-        """
+      Time Range: \(selectedRange.rawValue)
+      Log Count: \(logs.count) entries
+      """
     }
 
     return info
