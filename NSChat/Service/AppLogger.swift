@@ -1,6 +1,58 @@
 import Foundation
 import SwiftyBeaver
 
+/// Privacy level for log entries (compatible with OSLog privacy parameter)
+public enum Privacy {
+  case `public`
+  case `private`
+  case sensitive
+}
+
+/// Wrapper for values with privacy marking
+public struct PrivateValue {
+  let value: Any
+  let privacy: Privacy
+  
+  public init(_ value: Any, privacy: Privacy = .private) {
+    self.value = value
+    self.privacy = privacy
+  }
+  
+  var description: String {
+    switch privacy {
+    case .public:
+      return String(describing: value)
+    case .private:
+      return "<private>"
+    case .sensitive:
+      return maskSensitiveValue(String(describing: value))
+    }
+  }
+  
+  /// Mask sensitive value: show front and back, mask the middle half
+  private func maskSensitiveValue(_ value: String) -> String {
+    guard value.count > 2 else {
+      // If length <= 2, show only first character
+      if value.count == 1 {
+        return "*"
+      } else if value.count == 2 {
+        return String(value.prefix(1)) + "*"
+      }
+      return "**"
+    }
+    // Show approximately 1/4 at front, mask middle 1/2, show 1/4 at back
+    let frontCount = max(1, value.count / 4)
+    let backCount = max(1, value.count / 4)
+    let middleMaskCount = value.count - frontCount - backCount
+    
+    let frontPart = String(value.prefix(frontCount))
+    let backPart = String(value.suffix(backCount))
+    let middleMask = String(repeating: "*", count: middleMaskCount)
+    
+    return frontPart + middleMask + backPart
+  }
+}
+
 /// Unified logging management system
 /// Uses SwiftyBeaver for logging with emoji console output and file persistence
 public final class AppLogger {
@@ -75,6 +127,7 @@ public final class AppLogger {
       let mergedContext = mergeContext(context)
       SwiftyBeaver.fault(message(), file: file, function: function, line: line, context: mergedContext)
     }
+    
     
     private func mergeContext(_ context: [String: Any]?) -> [String: Any] {
       let categoryContext: [String: Any] = ["category": category]
@@ -181,4 +234,73 @@ public extension AppLogger.ErrorContext {
       metadata: nil
     )
   }
+}
+
+// MARK: - String Interpolation Extension for Privacy Support
+
+extension String.StringInterpolation {
+  /// Support for OSLog-style privacy parameter in string interpolation
+  /// Usage: "Message: \(value, privacy: .private)"
+  mutating func appendInterpolation<T>(_ value: T, privacy: Privacy) {
+    switch privacy {
+    case .public:
+      appendInterpolation(value)
+    case .private:
+      appendLiteral("<private>")
+    case .sensitive:
+      let valueString = String(describing: value)
+      appendLiteral(maskSensitiveValue(valueString))
+    }
+  }
+  
+  /// Support for OSLog-style privacy parameter with format
+  /// Usage: "Duration: \(duration, format: .fixed(precision: 3), privacy: .public)"
+  mutating func appendInterpolation<T>(_ value: T, format: StringFormat, privacy: Privacy = .public) {
+    switch privacy {
+    case .public:
+      switch format {
+      case .fixed(let precision):
+        if let doubleValue = value as? Double {
+          appendInterpolation(String(format: "%.\(precision)f", doubleValue))
+        } else if let floatValue = value as? Float {
+          appendInterpolation(String(format: "%.\(precision)f", floatValue))
+        } else {
+          appendInterpolation(value)
+        }
+      }
+    case .private:
+      appendLiteral("<private>")
+    case .sensitive:
+      let valueString = String(describing: value)
+      appendLiteral(maskSensitiveValue(valueString))
+    }
+  }
+  
+  /// Mask sensitive value: show front and back, mask the middle half
+  private func maskSensitiveValue(_ value: String) -> String {
+    guard value.count > 2 else {
+      // If length <= 2, show only first character
+      if value.count == 1 {
+        return "*"
+      } else if value.count == 2 {
+        return String(value.prefix(1)) + "*"
+      }
+      return "**"
+    }
+    // Show approximately 1/4 at front, mask middle 1/2, show 1/4 at back
+    let frontCount = max(1, value.count / 4)
+    let backCount = max(1, value.count / 4)
+    let middleMaskCount = value.count - frontCount - backCount
+    
+    let frontPart = String(value.prefix(frontCount))
+    let backPart = String(value.suffix(backCount))
+    let middleMask = String(repeating: "*", count: middleMaskCount)
+    
+    return frontPart + middleMask + backPart
+  }
+}
+
+/// Format options for string interpolation (compatible with OSLog)
+public enum StringFormat {
+  case fixed(precision: Int)
 }

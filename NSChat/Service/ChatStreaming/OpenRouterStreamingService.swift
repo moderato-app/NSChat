@@ -28,7 +28,7 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
         // Validate required config parameters
         guard let apiKey = config.apiKey, let modelID = config.modelID else {
           AppLogger.error.error(
-            "[OpenRouterStreamingService] ❌ Config error: missing apiKey or modelID"
+            "❌ Config error: missing apiKey or modelID"
           )
           DispatchQueue.main.async {
             onError(NSError(
@@ -118,7 +118,7 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
         } catch let AIProxyError.unsuccessfulRequest(statusCode, responseBody) {
           let errorMessage = "OpenRouter API Error: \(statusCode) - \(responseBody)"
           AppLogger.error.error(
-            "[OpenRouterStreamingService] ❌ API request failed: \(errorMessage)"
+            "❌ API request failed: \(errorMessage, privacy: .private)"
           )
           
           DispatchQueue.main.async {
@@ -131,7 +131,7 @@ class OpenRouterStreamingService: ChatStreamingServiceProtocol {
           
         } catch {
           AppLogger.error.error(
-            "[OpenRouterStreamingService] ❌ Streaming request failed: \(error.localizedDescription)"
+            "❌ Streaming request failed: \(error.localizedDescription, privacy: .private)"
           )
           
           DispatchQueue.main.async {
