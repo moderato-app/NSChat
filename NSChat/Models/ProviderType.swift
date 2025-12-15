@@ -42,7 +42,7 @@ enum ProviderType: Int32, Codable, CaseIterable {
     case .mock: return "Mock"
     }
   }
-  
+
   var openRouterPrefix: String? {
     switch self {
     case .openAI: return "openai"
@@ -57,6 +57,18 @@ enum ProviderType: Int32, Codable, CaseIterable {
     case .openRouter: return nil
     // These providers don't have models listed on OpenRouter with matching prefixes
     case .stabilityAI, .deepL, .replicate, .elevenLabs, .fal, .eachAI, .brave, .mock: return nil
+    }
+  }
+}
+
+extension ProviderType {
+  var recommendedModels: [String] {
+    switch self {
+    case .openAI: ["gpt-6", "gpt-5.2", "gpt-5.1", "gpt-5-mini"]
+    case .gemini: ["gemini-2.5-flash", "gemini-2.5-pro"]
+    case .openRouter: ["openai/gpt-6", "openai/gpt-5.2", "openai/gpt-5.1", "openai/gpt-5-mini"]
+    case .mock: ["mock-gpt-5"]
+    default: [""]
     }
   }
 }

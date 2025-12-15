@@ -85,8 +85,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.verbose(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func debug(
@@ -95,8 +102,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.debug(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func info(
@@ -105,8 +119,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.info(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func warning(
@@ -115,8 +136,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.warning(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func error(
@@ -125,8 +153,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.error(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func critical(
@@ -135,8 +170,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.critical(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     func fault(
@@ -145,8 +187,15 @@ public enum AppLogger {
     ) {
       AppLogger.initializeIfNeeded()
       let mergedContext = mergeContext(context)
+      func compressedMessage() -> Any {
+        let value = message()
+        if let stringValue = value as? String {
+          return stringValue.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        return value
+      }
       SwiftyBeaver.fault(
-        message(), file: file, function: function, line: line, context: mergedContext)
+        compressedMessage(), file: file, function: function, line: line, context: mergedContext)
     }
 
     private func mergeContext(_ context: [String: Any]?) -> [String: Any] {

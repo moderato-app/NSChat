@@ -19,21 +19,18 @@ extension ModelContext {
   }
 
   func chooseModel() throws -> ModelEntity? {
-    var model: ModelEntity?
-
     // Find model of the latest chat
     let predicate = #Predicate<Chat> { $0.option.model != nil }
     let fetcher = FetchDescriptor<Chat>(
       predicate: predicate,
       sortBy: [SortDescriptor(\Chat.updatedAt, order: .reverse)],
-      fetchLimit: 1
+      fetchLimit: 10
     )
     if let chat = try? fetch(fetcher).first {
       // Find the latest chat with model
-      model = chat.option.model
-    }
-    if let model {
-      return model
+      if let m = chat.option.model {
+        return m
+      }
     }
 
     // Find the model with the most chats
@@ -43,15 +40,24 @@ extension ModelContext {
       let models = options.compactMap { $0.model }
       let grouped = Dictionary(grouping: models) { $0.persistentModelID }
       if let mostUsed = grouped.max(by: { $0.value.count < $1.value.count }) {
-        model = mostUsed.value.first
+        if let m = mostUsed.value.first {
+          return m
+        }
       }
     }
 
     let fetcher3 = FetchDescriptor<ModelEntity>()
     if let allModels = try? fetch(fetcher3) {
-      model = ModelEntity.smartSort(allModels).first
+      let sortedModels = ModelEntity.smartSort(allModels)
+      for m in sortedModels {
+        if m.provider.type.recommendedModels.contains(m.modelId) {
+          return m
+        }
+      }
+      return allModels.first
     }
-    return model
+
+    return nil
   }
 
   func getMessage(messageId: PersistentIdentifier) -> Message? {
@@ -131,18 +137,18 @@ extension ModelContext {
     // Find all ChatOptions using this model
     // Use the relationship from ModelEntity to find ChatOptions
     let chatOptions = model.chatOptions
-    
+
     // Set model to nil for all ChatOptions
     for option in chatOptions {
       option.model = nil
     }
-    
+
     // Remove model from provider's models array
     model.provider.models.removeAll(where: { $0 == model })
-    
+
     // Delete the model
     delete(model)
-    
+
     AppLogger.data.info("Deleted model: \(model.modelId), cleared \(chatOptions.count) chat options")
   }
 
@@ -150,7 +156,7 @@ extension ModelContext {
     // Find all models of this provider
     let models = provider.models
     var totalClearedOptions = 0
-    
+
     // For each model, clear all ChatOptions that use it
     for model in models {
       let chatOptions = model.chatOptions
@@ -159,10 +165,10 @@ extension ModelContext {
       }
       totalClearedOptions += chatOptions.count
     }
-    
+
     // Delete the provider (this will cascade delete all models)
     delete(provider)
-    
+
     AppLogger.data.info("Deleted provider: \(provider.displayName), cleared \(totalClearedOptions) chat options from \(models.count) models")
   }
 }
