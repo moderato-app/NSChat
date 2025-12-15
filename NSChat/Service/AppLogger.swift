@@ -53,6 +53,7 @@ public enum AppLogger {
   // MARK: - Initialization
 
   private static var isInitialized = false
+  private static var fileDestination: FileDestination?
 
   /// Initialize SwiftyBeaver destinations
   private static func initializeIfNeeded() {
@@ -69,8 +70,53 @@ public enum AppLogger {
     let file = FileDestination()
     file.format = "$DHH:mm:ss.SSS$d $C$L$c $N:$l $F - $M $X"
     SwiftyBeaver.addDestination(file)
+    fileDestination = file
+
+    // Clean up old log files on initialization
+    cleanOldLogFiles(maxAgeInDays: 7)
 
     isInitialized = true
+  }
+
+  // MARK: - Log File Cleanup
+
+  /// Clean up log files older than specified days
+  /// - Parameter maxAgeInDays: Maximum age of log files in days (default: 7)
+  public static func cleanOldLogFiles(maxAgeInDays: Int = 7) {
+    guard let fileURL = fileDestination?.logFileURL else { return }
+
+    let fileManager = FileManager.default
+    let logDirectory = fileURL.deletingLastPathComponent()
+    let cutoffDate = Date().addingTimeInterval(-TimeInterval(maxAgeInDays * 24 * 60 * 60))
+
+    do {
+      let files = try fileManager.contentsOfDirectory(
+        at: logDirectory,
+        includingPropertiesForKeys: [.creationDateKey, .contentModificationDateKey],
+        options: [.skipsHiddenFiles]
+      )
+
+      var deletedCount = 0
+      for file in files {
+        // Check if file is a log file (swiftybeaver.log or rotated files like swiftybeaver.1.log)
+        let fileName = file.lastPathComponent
+        if fileName.hasPrefix("swiftybeaver") && fileName.hasSuffix(".log") {
+          // Get file modification date
+          let attributes = try fileManager.attributesOfItem(atPath: file.path)
+          if let modificationDate = attributes[.modificationDate] as? Date,
+            modificationDate < cutoffDate {
+            try fileManager.removeItem(at: file)
+            deletedCount += 1
+          }
+        }
+      }
+
+      if deletedCount > 0 {
+        data.info("Cleaned up \(deletedCount) old log file(s) older than \(maxAgeInDays) days")
+      }
+    } catch {
+      AppLogger.error.error("Failed to clean up old log files: \(error.localizedDescription)")
+    }
   }
 
   // MARK: - Category Logger
