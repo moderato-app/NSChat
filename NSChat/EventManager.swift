@@ -12,8 +12,6 @@ class EM: ObservableObject {
   let messageCountChange = PassthroughSubject<PersistentIdentifier, Never>()
 
   let chatOptionChanged = PassthroughSubject<Void, Never>()
-
-  let shouldFetchModels = PassthroughSubject<PersistentIdentifier, Never>()
 }
 
 enum MessageEventType {
