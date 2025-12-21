@@ -85,11 +85,6 @@ struct ModelListSection: View {
         }
       }
     }
-    .onReceive(em.shouldFetchModels) { providerId in
-      if providerId == provider.persistentModelID && !provider.apiKey.isEmpty {
-        fetchModels()
-      }
-    }
   }
 
   @ViewBuilder
@@ -136,8 +131,7 @@ struct ModelListSection: View {
 
         await MainActor.run {
           fetchStatus = .success(modelInfos.count)
-          updateModels(with: modelInfos)
-          try? modelContext.save()
+          provider.syncModels(with: modelInfos, in: modelContext)
           AppLogger.data.info("Fetched \(modelInfos.count) models for \(provider.displayName)")
         }
       } catch {
@@ -166,58 +160,6 @@ struct ModelListSection: View {
           component: "ModelListSection"
         ))
     }
-  }
-
-  func updateModels(with modelInfos: [ModelInfo]) {
-    let existingModels = provider.models
-
-    var toAdd: [ModelEntity] = []
-    var toDel: [ModelEntity] = []
-
-    for modelInfo in modelInfos {
-      let existingModels = existingModels.filter {
-        $0.modelId == modelInfo.id && !$0.isCustom
-      }
-
-      if existingModels.isEmpty {
-        let newModel = ModelEntity(
-          provider: provider,
-          modelId: modelInfo.id,
-          modelName: modelInfo.name,
-          inputContextLength: modelInfo.inputContextLength,
-          outputContextLength: modelInfo.outputContextLength
-        )
-        toAdd.append(newModel)
-      } else {
-        // Keep only custom
-        let customs = existingModels.filter { $0.isCustom }
-        if !customs.isEmpty {
-          existingModels.filter { !customs.contains($0) }.forEach {
-            toDel.append($0)
-          }
-          continue
-        }
-
-        if let first = existingModels.first {
-          first.modelName = modelInfo.name
-          first.inputContextLength = modelInfo.inputContextLength
-          first.outputContextLength = modelInfo.outputContextLength
-          existingModels.filter { $0 != first }.forEach {
-            toDel.append($0)
-          }
-        }
-      }
-    }
-
-    let modelIDs = Set(modelInfos.map { $0.id })
-    let modelsToDelete = existingModels.filter { !$0.isCustom && !modelIDs.contains($0.modelId) }
-    toDel.append(contentsOf: modelsToDelete)
-
-    for del in toDel {
-      provider.models.removeAll(where: { del == $0 })
-    }
-
-    provider.models.append(contentsOf: toAdd)
   }
 }
 

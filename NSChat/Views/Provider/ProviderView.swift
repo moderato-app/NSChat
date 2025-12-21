@@ -90,26 +90,26 @@ struct ProviderView: View {
   private func saveProvider() {
     modelContext.insert(provider)
     AppLogger.data.info("Added new provider: \(provider.displayName) with \(provider.models.count) models")
-    
+
     // If provider has no models, try to fetch them
     if provider.models.isEmpty {
       Task {
         await fetchModelsForProvider()
       }
     }
-    
+
     dismiss()
   }
-  
+
   private func fetchModelsForProvider() async {
     guard !provider.apiKey.isEmpty else {
       AppLogger.data.info("Skipping model fetch for \(provider.displayName): API key is empty")
       return
     }
-    
+
     let service = ProviderModelFetchService(modelContext: modelContext)
     let fetchedModels: [ModelInfo]
-    
+
     do {
       fetchedModels = try await service.fetchModels(
         providerType: provider.type,
@@ -124,45 +124,11 @@ struct ProviderView: View {
       ))
       return
     }
-    
+
     // Update provider's models if we fetched any
     if !fetchedModels.isEmpty {
       await MainActor.run {
-        updateProviderModels(with: fetchedModels)
-      }
-    }
-  }
-  
-  private func updateProviderModels(with modelInfos: [ModelInfo]) {
-    var toAdd: [ModelEntity] = []
-    
-    for modelInfo in modelInfos {
-      // Check if model already exists
-      let exists = provider.models.contains { $0.modelId == modelInfo.id }
-      if !exists {
-        let newModel = ModelEntity(
-          provider: provider,
-          modelId: modelInfo.id,
-          modelName: modelInfo.name,
-          inputContextLength: modelInfo.inputContextLength,
-          outputContextLength: modelInfo.outputContextLength
-        )
-        toAdd.append(newModel)
-      }
-    }
-    
-    if !toAdd.isEmpty {
-      provider.models.append(contentsOf: toAdd)
-      AppLogger.data.info("Added \(toAdd.count) models to provider \(provider.displayName)")
-      
-      do {
-        try modelContext.save()
-      } catch {
-        AppLogger.logError(.from(
-          error: error,
-          operation: "Save models to provider",
-          component: "ProviderView"
-        ))
+        provider.syncModels(with: fetchedModels, in: modelContext)
       }
     }
   }
