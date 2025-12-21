@@ -75,6 +75,14 @@ struct InputAreaView: View {
           .onTapGesture {
             send(chat.option.historyCount)
           }
+          .background {
+            Button("") {
+              send(chat.option.historyCount)
+            }
+            .frame(width: 1, height: 1)
+            .opacity(0.01)
+            .keyboardShortcut(.return, modifiers: .command)
+          }
           .contextMenu {
             let count = chat.messages.count
             Section("History Messages") {
