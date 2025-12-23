@@ -89,12 +89,14 @@ struct ProviderView: View {
 
   private func saveProvider() {
     modelContext.insert(provider)
+    try? modelContext.save()
     AppLogger.data.info("Added new provider: \(provider.displayName) with \(provider.models.count) models")
 
     // If provider has no models, try to fetch them
     if provider.models.isEmpty {
       Task {
         await fetchModelsForProvider()
+        try? modelContext.save()
       }
     }
 
@@ -128,7 +130,7 @@ struct ProviderView: View {
     // Update provider's models if we fetched any
     if !fetchedModels.isEmpty {
       await MainActor.run {
-        provider.syncModels(with: fetchedModels, in: modelContext)
+        provider.syncModels(with: fetchedModels)
       }
     }
   }

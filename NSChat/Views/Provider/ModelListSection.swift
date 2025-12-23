@@ -131,7 +131,7 @@ struct ModelListSection: View {
 
         await MainActor.run {
           fetchStatus = .success(modelInfos.count)
-          provider.syncModels(with: modelInfos, in: modelContext)
+          provider.syncModels(with: modelInfos)
           AppLogger.data.info("Fetched \(modelInfos.count) models for \(provider.displayName)")
         }
       } catch {

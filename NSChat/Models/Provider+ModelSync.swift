@@ -12,7 +12,7 @@ extension Provider {
   /// - If model doesn't exist: add new model
   /// - If model exists but not in fetched list and is not custom: delete it
   /// - Custom models are never updated or deleted
-  func syncModels(with modelInfos: [ModelInfo], in modelContext: ModelContext) {
+  func syncModels(with modelInfos: [ModelInfo]) {
     let existingModels = models
     
     var toAdd: [ModelEntity] = []
@@ -68,28 +68,16 @@ extension Provider {
     // Remove and delete models marked for deletion
     for del in toDel {
       models.removeAll(where: { del == $0 })
-      modelContext.delete(del)
     }
     
     // Add new models
     for newModel in toAdd {
-      modelContext.insert(newModel)
       models.append(newModel)
     }
 
     // Log the sync operation
     if !toAdd.isEmpty || !toDel.isEmpty {
       AppLogger.data.info("Synced models for \(displayName): added \(toAdd.count), deleted \(toDel.count)")
-    }
-    
-    do {
-      try modelContext.save()
-    } catch {
-      AppLogger.logError(.from(
-        error: error,
-        operation: "Save models to provider",
-        component: "ProviderView"
-      ))
     }
   }
 }
