@@ -53,16 +53,6 @@ extension SettingView {
 
       VersionView()
 
-      ShareLink(item: URL(string: appHTTPS)!) {
-        Label {
-          Text("Share App")
-            .tint(.primary)
-        } icon: {
-          Image(systemName: "heart")
-            .foregroundStyle(.pink)
-        }
-      }
-
       Button {
         safariAddr = appHTTPS
       } label: {
@@ -81,7 +71,7 @@ extension SettingView {
           Text("View on GitHub")
             .tint(.primary)
         } icon: {
-          Image(systemName: "chevron.left.forwardslash.chevron.right")
+          Image(systemName: "cat.circle.fill")
         }
       }
     }
