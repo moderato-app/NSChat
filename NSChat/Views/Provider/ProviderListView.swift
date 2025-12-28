@@ -48,6 +48,7 @@ struct ProviderListView: View {
     .sheet(isPresented: $isAddProviderPresented) {
       let provider = Provider(type: .openAI)
       ProviderView(provider: provider, mode: .Add)
+        .presentationSizing(.page)
     }
     .confirmationDialog(
       providersToDelete.count == 1
