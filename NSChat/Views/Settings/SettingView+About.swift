@@ -67,7 +67,7 @@ extension SettingView {
         safariAddr = appHTTPS
       } label: {
         Label {
-          Text("Show in App Store")
+          Text("View on App Store")
             .tint(.primary)
         } icon: {
           Image(systemName: "apple.logo")
@@ -78,7 +78,7 @@ extension SettingView {
         safariAddr = githubHTTPS
       } label: {
         Label {
-          Text("Show in GitHub")
+          Text("View on GitHub")
             .tint(.primary)
         } icon: {
           Image(systemName: "chevron.left.forwardslash.chevron.right")
