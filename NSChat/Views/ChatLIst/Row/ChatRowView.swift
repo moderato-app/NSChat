@@ -27,7 +27,7 @@ struct ChatRowView: View {
   var body: some View {
     // let _ = Self.printChagesWhenDebug()
 
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 4) {
       HStack(alignment: .firstTextBaseline) {
         Text(chat.name)
           .fontWeight(.semibold)
@@ -61,6 +61,7 @@ struct ChatRowView: View {
       .foregroundStyle(.secondary)
       .lineLimit(2)
     }
+    .fixedSize(horizontal: false, vertical: true)
     .onAppear {
       loadLatestMsg()
     }

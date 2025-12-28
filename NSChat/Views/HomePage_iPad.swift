@@ -70,3 +70,4 @@ struct HomePage_iPad: View {
     HomePage_iPad()
   }
 }
+
