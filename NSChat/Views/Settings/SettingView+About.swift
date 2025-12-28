@@ -4,6 +4,7 @@ private let privacyHTTPS = "https://nschat.moderato.app/privacy"
 private let termsHTTPS = "https://nschat.moderato.app/terms"
 private let testFlightHTTPS = "https://testflight.apple.com/join/axaO3S26"
 private let appHTTPS = "https://apps.apple.com/app/id6478404197"
+private let githubHTTPS = "https://github.com/moderato-app/NSChat"
 
 extension SettingView {
   @ViewBuilder
@@ -70,6 +71,17 @@ extension SettingView {
             .tint(.primary)
         } icon: {
           Image(systemName: "apple.logo")
+        }
+      }
+
+      Button {
+        safariAddr = githubHTTPS
+      } label: {
+        Label {
+          Text("Show in GitHub")
+            .tint(.primary)
+        } icon: {
+          Image(systemName: "chevron.left.forwardslash.chevron.right")
         }
       }
     }
