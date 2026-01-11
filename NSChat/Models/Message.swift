@@ -48,9 +48,15 @@ final class Message: Comparable {
   }
 
   static func < (lhs: Message, rhs: Message) -> Bool {
-    return lhs.createdAt < rhs.createdAt
+    if lhs.createdAt != rhs.createdAt {
+      return lhs.createdAt < rhs.createdAt
+    }
+    // if createdAt is the same, user message should be before assistant message
+    if lhs.role == .user && rhs.role == .assistant {
+      return true
+    }
+    return false
   }
-
   // user
   func onSent() {
     switch self.status {
