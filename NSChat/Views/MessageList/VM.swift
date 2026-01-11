@@ -15,7 +15,7 @@ extension InputAreaView {
     cancellable = subject
       .debounce(for: .seconds(1), scheduler: RunLoop.main)
       .sink { value in
-        AppLogger.ui.debug("chat.input = value")
+        AppLogger.ui.debug("set chat.input to value: \(value, privacy: .private)")
         chat.input = value
       }
   }
@@ -108,7 +108,8 @@ extension InputAreaView {
       )
       actualCL = hist.count
 
-      for item in hist.sorted().reversed() {
+      // visit recent messages first
+      for item in hist.sorted() {
         let msgType: ChatMessage.MessageType
         let content = item.message.isMeaningful ? item.message : item.errorInfo
         switch item.role {
@@ -158,6 +159,8 @@ extension InputAreaView {
     )
 
     var aiMsg = Message("", .assistant, .thinking)
+    // add a small offset to avoid timestamp conflict
+    aiMsg.createdAt = userMsg.createdAt.addingTimeInterval(0.001)
     aiMsg.chat = chat
     aiMsg.meta = .init(
       provider: model.provider.displayName,

@@ -94,7 +94,7 @@ struct MessageMetaView: View {
             Text(startedAt, format: Date.FormatStyle(date: .long, time: .omitted))
               .fontWeight(.light)
               .foregroundStyle(.secondary)
-            Text(startedAt, format: Date.FormatStyle(date: .omitted, time: .standard))
+            Text(startedAt, format: .dateTime.hour().minute().second().secondFraction(.fractional(3)))
               .fontWeight(.light)
           }
         }
@@ -107,7 +107,7 @@ struct MessageMetaView: View {
             Text(endedAt, format: Date.FormatStyle(date: .long, time: .omitted))
               .fontWeight(.light)
               .foregroundStyle(.secondary)
-            Text(endedAt, format: Date.FormatStyle(date: .omitted, time: .standard))
+            Text(endedAt, format: .dateTime.hour().minute().second().secondFraction(.fractional(3)))
               .fontWeight(.light)
           }
         }

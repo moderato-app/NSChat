@@ -78,7 +78,7 @@ extension ModelContext {
     }
     var fetchDescriptor = FetchDescriptor<Message>(predicate: predicate, sortBy: [SortDescriptor(\Message.createdAt, order: .reverse)])
     fetchDescriptor.fetchLimit = limit
-    return try! fetch(fetchDescriptor).sorted()
+    return try! fetch(fetchDescriptor)
   }
 
   func findPromptById(promptId: PersistentIdentifier) -> Prompt? {
